@@ -1,5 +1,12 @@
 <script lang="ts" src="./EngagementTable.ts"></script>
 
 <template>
-  <div v-for="engagement in engagements" :key="1"></div>
+  <div>test</div>
+  <div
+    v-for="engagement in engagements"
+    :key="engagement.id"
+    data-test="engagement"
+  >
+    test
+  </div>
 </template>
