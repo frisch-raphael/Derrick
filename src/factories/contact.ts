@@ -1,4 +1,5 @@
 import faker from 'faker';
+import { IContact } from 'src/dtos/contact';
 
 export const makeFakeContact = (): IContact => {
     return {

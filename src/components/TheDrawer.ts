@@ -1,5 +1,7 @@
-import { Context } from 'src/types/types';
-import { defineComponent } from 'vue';
+import { defineComponent, ref, Ref } from 'vue';
+
+type MenuElement = { name?: string, icon?: string, isSeparator?: boolean, isTitle?: boolean, goto?: string }
+
 
 export default defineComponent({
     name: 'TheDrawer',
@@ -7,15 +9,11 @@ export default defineComponent({
         reportTitle: {
             type: String,
             required: true,
-        },
-        context: {
-            type: Object as () => Context,
-            required: true,
-        },
+        }
     },
     setup(props) {
-        const adminMenu = [
-            { name: 'Administration', isTitle: true, isSeparator: true },
+        const adminMenu: MenuElement[] = [
+            { name: 'Columbo administration', isTitle: true, isSeparator: false },
             { name: 'Configuration', icon: 'mdi-cog' },
             { name: 'Users', icon: 'mdi-account' },
             {
@@ -36,39 +34,44 @@ export default defineComponent({
             },
             { name: 'Add plugin', icon: 'mdi-plus' },
         ];
-        const engagementMenu = [
+        const engagementMenu: MenuElement[] = [
             { name: props.reportTitle, isTitle: true },
-            { name: 'Engagement configuration', icon: 'mdi-cog', isTitle: false },
-            { name: 'View charts', icon: 'mdi-chart-arc', isTitle: false },
-            { name: 'Findings', icon: 'mdi-table-column-plus-after', isTitle: false },
+            { name: 'Engagement configuration', icon: 'mdi-cog' },
+            { name: 'View charts', icon: 'mdi-chart-arc' },
+            { name: 'Findings', icon: 'mdi-table-column-plus-after' },
             // eslint-disable-next-line max-len
             // {name: 'Add findings from templates', icon: 'mdi-table-column-plus-after'},
-            { name: 'Exploitations', icon: 'mdi-bomb', isTitle: false },
-            { name: 'UDOs', icon: 'mdi-collapse-all-outline', isTitle: false },
+            { name: 'Exploitations', icon: 'mdi-bomb' },
+            { name: 'UDOs', icon: 'mdi-collapse-all-outline' },
             // { name: "Generate", title: true },
-            { name: null, icon: null, isSeparator: true, isTitle: false },
-            { name: 'Docx', icon: 'mdi-book-check', isTitle: false },
-            { name: 'Excel', icon: 'mdi-view-list', isTitle: false },
-            { name: 'PowerPoint', icon: 'mdi-message-settings', isTitle: false },
-            { name: null, icon: null, isSeparator: true, isTitle: false },
-            { name: 'Other engagements', icon: 'mdi-arrow-right', isTitle: false },
+            { name: undefined, icon: undefined, isSeparator: true },
+            { name: 'Docx', icon: 'mdi-book-check' },
+            { name: 'Excel', icon: 'mdi-view-list' },
+            { name: 'PowerPoint', icon: 'mdi-message-settings' },
+            { name: undefined, icon: undefined, isSeparator: true },
+            { name: 'Other engagements', icon: 'mdi-arrow-right', goto: 'engagements' },
         ];
 
         const getDrawerTitleClasses = (isTitle?: boolean) => {
             return isTitle ? 'text-weight-bold' : '';
         };
 
-        const currentMenu =
-            props.context == 'administration' ? adminMenu : engagementMenu;
+        const isUserAdmin = () => {
+            return true
+        }
+
+        const currentMenu: Ref<MenuElement[]> = ref(engagementMenu)
+        // const currentMenu =
+        // props.context == 'administration' ? adminMenu : engagementMenu;
+        const switchDrawerContext = (context: 'admin' | 'engagement') =>
+            currentMenu.value = context == 'admin' ? adminMenu : engagementMenu
 
         return {
             currentMenu,
             getDrawerTitleClasses,
+            isUserAdmin,
+            switchDrawerContext
         };
-    },
-    computed: {
-        navigationDrawerName() {
-            return this.context == 'administration' ? 'Admin pannel' : 'Reporting';
-        },
-    },
+    }
+
 });

@@ -1,12 +1,15 @@
 <script lang="ts" src="./EngagementTable.ts"></script>
 
 <template>
-  <div>test</div>
-  <div
-    v-for="engagement in engagements"
-    :key="engagement.id"
-    data-test="engagement"
+  <base-table
+    :columns="engagementColumns"
+    :rows="engagementsRows"
+    title="Engagements"
+    :loading="loading"
   >
-    test
-  </div>
+    <template #card-buttons>
+      <q-btn class="q-ma-sm" rounded icon="mdi-domain"></q-btn>
+      <q-btn class="q-ma-sm q-ml-sm" rounded icon="mdi-content-save"></q-btn>
+    </template>
+  </base-table>
 </template>

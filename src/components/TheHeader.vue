@@ -11,8 +11,6 @@
         >Administration</q-btn
       >
 
-      <q-divider inset vertical />
-
       <q-btn class="q-mr-xs q-ml-xs" color="primary" plain>
         <q-icon left name="mdi-account-arrow-left" />
 

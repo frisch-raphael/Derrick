@@ -5,6 +5,7 @@
       "cypress",
     ],
     "strict": true, // note strict mode, this isn't default
-    "baseUrl": "."
+    "baseUrl": ".",
+    "sourceMap": true,
   },
 }

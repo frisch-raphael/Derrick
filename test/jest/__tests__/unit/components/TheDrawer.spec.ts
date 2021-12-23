@@ -8,31 +8,28 @@ import TheDrawer from 'src/components/TheDrawer';
 // // Specify here Quasar config you'll need to test your component
 installQuasarPlugin();
 
+const engagementMenuElementSelector = "[data-test='Findings']"
+const adminMenuElementSelector = "[data-test='Configuration']"
+const toAdminElementSelector = "[data-test='to-admin']"
+const toEngagementsElementSelector = "[data-test='Other engagements']"
+
 describe('TheDrawer', () => {
-  it('has getDrawerTitleClasses method', () => {
-    const wrapper = shallowMount(TheDrawer);
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-    expect(typeof wrapper.vm.getDrawerTitleClasses).toBe('function');
-  });
 
-  it('can show the administration pannel', () => {
-    const wrapper = mount(TheDrawer, {
-      props: {
-        context: 'administration',
-      },
-    } as any);
-    const adminMenuElement = wrapper.findComponent(
-      "[data-test='Configuration']"
-    );
+  it('has element from the administration menu', async () => {
+    const wrapper = mount(TheDrawer);
+    wrapper.vm.switchDrawerContext('admin')
+    await wrapper.findComponent(toAdminElementSelector).trigger('click');
+    const adminMenuElement = wrapper.findComponent(adminMenuElementSelector);
     expect(adminMenuElement.exists()).toBe(true);
-    expect(adminMenuElement.text()).toEqual('Configuration');
   });
 
-  it('can show the engagement pannel', () => {
-    const wrapper = mount(TheDrawer, {
-      props: { context: 'administration' }
-    } as any);
-    const engagementMenuElement = wrapper.findComponent("[data-test='Findings']");
+  it('has element from the engagement menu', () => {
+    const wrapper = mount(TheDrawer);
+
+    // const wrapper = mount(TheDrawer, {
+    //   props: { context: 'administration' }
+    // } as any);
+    const engagementMenuElement = wrapper.findComponent(engagementMenuElementSelector);
     // expect(wrapper.findComponent(QItem).exists()).toBe(true);
     expect(engagementMenuElement.exists()).toBe(true);
     expect(engagementMenuElement.text()).toEqual('Findings');
@@ -42,47 +39,39 @@ describe('TheDrawer', () => {
   it('display the correct title', () => {
     const dummyTitle = 'Penetration test'
     const wrapper = mount(TheDrawer, {
-      props: { context: 'engagement', reportTitle: dummyTitle }
+      props: { reportTitle: dummyTitle }
     } as any);
     expect(wrapper.html()).toContain(dummyTitle);
   });
-  // it('activates a menu item when clicked', () => {
-  //   const wrapper = shallowMount(TheDrawer);
-  //   wrapper.findComponent('[data-test]=Administration')
-  //   // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-  //   expect(typeof wrapper.vm.getDrawerTitleClasses).toBe('function');
-  // });
+
+  it('can switch from administration to engagements', () => {
+    const wrapper = mount(TheDrawer);
+    const engagementButtonSwitcher = wrapper.findComponent("[data-test='to-engagement']");
+    // expect(wrapper.findComponent(QItem).exists()).toBe(true);
+    expect(engagementButtonSwitcher.exists()).toBe(true);
+    wrapper.vm.switchDrawerContext('engagement')
+    const engagementMenuElement = wrapper.findComponent(engagementMenuElementSelector);
+    expect(engagementMenuElement.exists()).toBe(true);
+  });
+
+
+  it('can switch from engagements to administration', async () => {
+    const wrapper = mount(TheDrawer);
+    const element = wrapper.findComponent(toAdminElementSelector);
+    // expect(wrapper.findComponent(QItem).exists()).toBe(true);
+    expect(element.exists()).toBe(true);
+    await element.trigger('click');
+    wrapper.vm.switchDrawerContext('admin');
+    const adminMenuElement = wrapper.findComponent(adminMenuElementSelector);
+    expect(adminMenuElement.exists()).toBe(true);
+  });
+
+  it('has a go to other engagements button', () => {
+    const wrapper = mount(TheDrawer);
+    const element = wrapper.findComponent(toEngagementsElementSelector);
+    // expect(wrapper.findComponent(QItem).exists()).toBe(true);
+    expect(element.exists()).toBe(true);
+  });
+
+
 });
-
-// describe('MyButton', () => {
-//   it('has increment method', () => {
-//     const wrapper = mount(MyButton);
-//     const { vm } = wrapper;
-
-//     expect(typeof vm.increment).toBe('function');
-//   });
-
-//   it('can check the inner text content', () => {
-//     const wrapper = mount(MyButton);
-//     const { vm } = wrapper;
-
-//     expect((vm.$el as HTMLElement).textContent).toContain('rocket muffin');
-//     expect(wrapper.find('.content').text()).toContain('rocket muffin');
-//   });
-
-//   it('sets the correct default data', () => {
-//     const wrapper = mount(MyButton);
-//     const { vm } = wrapper;
-
-//     expect(typeof vm.counter).toBe('number');
-//     expect(vm.counter).toBe(0);
-//   });
-
-//   it('correctly updates counter when button is pressed', async () => {
-//     const wrapper = shallowMount(MyButton);
-//     const { vm } = wrapper;
-//     const button = wrapper.findComponent(QBtn);
-//     await button.trigger('click');
-//     expect(vm.counter).toBe(1);
-//   });
-// });

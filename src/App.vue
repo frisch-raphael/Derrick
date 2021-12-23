@@ -1,7 +1,7 @@
 <template>
   <q-layout>
     <TheHeader />
-    <q-drawer show-if-above :width="250" elevated class="">
+    <q-drawer show-if-above :width="250" elevated>
       <TheDrawer
         report-title="Test d'intrusion externe clinique de Durtol"
         context="administration"

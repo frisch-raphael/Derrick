@@ -11,6 +11,7 @@ export const makeFakeEngagement = (): IEngagement => {
     return {
         id: getRandomInt(10000),
         title: tests[getRandomInt(tests.length)],
+        assessment_type: tests[getRandomInt(tests.length)],
         start_date: faker.date.past(),
         end_date: faker.date.past(),
         scoring: getRandomInt(2),

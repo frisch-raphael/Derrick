@@ -16,5 +16,6 @@
       ],
       "url": "https://on.cypress.io/cypress.schema.json"
     }
-  ]
+  ],
+  "jest.jestCommandLine": "npm run test:unit:watch --"
 }

@@ -1,4 +1,5 @@
 import faker from 'faker';
+import { ICompany } from 'src/dtos/company';
 import { makeFakeContact } from './contact';
 
 export const makeFakeCompany = (): ICompany => {

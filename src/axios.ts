@@ -2,8 +2,7 @@
 // code below would be it's own .tsx file:
 
 /* eslint-disable no-console */
-import axios, { AxiosRequestConfig, AxiosResponse, AxiosError } from 'axios';
-import { IEngagement } from './dtos/engagement';
+import axios, { AxiosRequestConfig, AxiosError } from 'axios';
 
 const apiRoot = 'http://localhost:3000/';
 
