@@ -27,8 +27,13 @@ describe('the engagement table', () => {
         expect(request).toHaveBeenCalledTimes(1);
         expect(request).toHaveBeenCalledWith({ method: 'get', url: Endpoints.Engagements });
         expect(wrapper.vm.engagementsRows).toHaveLength(10);
-        const engagements = wrapper.findAll('[data-test="table-item"]');
-        expect(engagements).toHaveLength(10);
+    });
+
+    it('loading updates', async () => {
+        const wrapper = mount(EngagementTable);
+        expect(wrapper.vm.loading).toBe(10);
+        await flushPromises();
+        expect(wrapper.vm.loading).toBe(20);
     });
 
 });

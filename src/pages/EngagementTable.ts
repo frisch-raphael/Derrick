@@ -117,7 +117,7 @@ export default defineComponent({
         let engagements: IEngagement[] = []
         type engagementRow = { name: string } & Partial<IEngagement>
         const engagementsRows: Ref<engagementRow[]> = ref([])
-        const loading = ref(true)
+        const loading = ref(10)
         const engagementColumns: EngagementColumn[] = [
             {
                 name: 'assessment_type', field: 'assessment_type', label: 'Assessment Type'
@@ -131,8 +131,8 @@ export default defineComponent({
 
         onMounted(async () => {
             const response = await request<IEngagement[]>({ method: 'get', url: Endpoints.Engagements })
-            loading.value = false
             engagements = response.data
+            loading.value = 20
             engagementsRows.value = engagements.map((e, index) => ({
                 name: `#${index + 1} ${e.title}`,
                 assessment_type: e.assessment_type,
@@ -148,4 +148,5 @@ export default defineComponent({
             loading
         }
     },
+
 });
