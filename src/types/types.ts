@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 
 export type Context = 'administration' | 'engagement'
 
@@ -6,9 +5,6 @@ export type LooseDictionary = { [index in string]: any };
 
 export type Column<T> =
     {
-        /**
-         * Unique id, identifies column, (used by pagination.sortBy, 'body-cell-[name]' slot, ...)
-         */
         name: string;
         /**
          * Label for header
@@ -19,7 +15,7 @@ export type Column<T> =
          * @param row The current row being processed
          * @returns Value for this column
          */
-        field: keyof T | ((row: LooseDictionary) => any);
+        field: keyof T & string | ((row: LooseDictionary) => any);
         /**
          * If we use visible-columns, this col will always be visible
          */
@@ -79,4 +75,89 @@ export type Column<T> =
         headerClasses?: string;
     }
 
-export type Columns<T> = Column<T>[] | undefined
+export type Columns<T = void> = Column<T>[] | undefined
+
+
+export type TableItem = {
+    key: any;
+    /**
+     * Row/Item object
+     */
+    row: LooseDictionary;
+    /**
+     * Row/Item's index (0 based) in the filtered and sorted table
+     */
+    rowIndex: number;
+    /**
+     * Row/Item's index (0 based) in the current page of the filtered and sorted table
+     */
+    pageIndex: number;
+    /**
+     * Column definitions
+     */
+    cols: LooseDictionary;
+    /**
+     * Column mapping (key is column name, value is column object)
+     */
+    colsMap: LooseDictionary;
+    /**
+     * Trigger a table sort
+     * @param col Column name or column definition object
+     */
+    sort: (col: string | LooseDictionary) => void;
+    /**
+     * (Only if using selection) Is row/item selected? Can directly be assigned new Boolean value which changes selection state
+     */
+    selected: boolean;
+    /**
+     * Is row/item expanded? Can directly be assigned new Boolean value which changes expanded state
+     */
+    expand: boolean;
+    /**
+     * Color name for component from the Quasar Color Palette
+     */
+    color: string;
+    /**
+     * Notify the component that the background is a dark color
+     */
+    dark: boolean;
+    /**
+     * Dense mode; occupies less space
+     */
+    dense: boolean;
+}
+
+type FunctionlessCardAction = {
+    icon: string,
+    color: string,
+    tooltip: string,
+    name: string,
+}
+
+type FunctionlessHeaderAction = {
+    icon: string,
+    name: string,
+    datatest: string,
+}
+
+type FunctionCardAction = {
+    function: (id: number) => void,
+    isRessourcePayloadNeed: false
+} | {
+    function: (id: number, payload: Record<string, any>) => void,
+    isRessourcePayloadNeed: true
+}
+
+type FunctionHeaderdAction = {
+    function: () => void,
+    isRowsNeeded: false
+} | {
+    function: (rows: Record<string, any>[]) => void,
+    isRowsNeeded: true
+}
+
+
+
+export type CardAction = (FunctionCardAction) & FunctionlessCardAction
+export type HeaderAction = (FunctionHeaderdAction) & FunctionlessHeaderAction
+export type Row = { id: number, [x: string]: any }

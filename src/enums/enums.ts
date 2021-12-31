@@ -3,6 +3,14 @@ export enum Scoring {
     RiskMatrix = 1
 }
 
-export enum Endpoints {
-    Engagements = '/engagements'
+export enum RessourceName {
+    Engagement = 'engagement',
+    Contact = 'contact',
+    Company = 'companie'
+}
+
+export enum ApiRessource {
+    Engagement = 'engagements',
+    Contact = 'contacts',
+    Company = 'companies'
 }

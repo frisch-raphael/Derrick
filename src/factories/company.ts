@@ -1,6 +1,6 @@
 import faker from 'faker';
 import { ICompany } from 'src/dtos/company';
-import { makeFakeContact } from './contact';
+// import { makeFakeContact } from './contact';
 
 export const makeFakeCompany = (): ICompany => {
     const companyName = faker.company.companyName();
@@ -10,6 +10,6 @@ export const makeFakeCompany = (): ICompany => {
         short_name: companyName.substring(0, 3),
         city: faker.address.city(),
         address: faker.address.streetAddress(),
-        contacts: [makeFakeContact(), makeFakeContact()]
-    }
-}
+        // contacts: [makeFakeContact(), makeFakeContact()]
+    };
+};

@@ -2,27 +2,27 @@
 
 <template>
   <q-scroll-area class="fit">
-    <q-list class="q-my-xs">
+    <q-list class="q-my-md">
       <q-item v-if="isUserAdmin()">
-        <q-btn-group rounded class="absolute-center q-mt-xs">
+        <q-btn-group rounded class="absolute-center q-ma-xs">
           <q-btn
-            color="blue-grey-4"
             data-test="to-engagement"
             rounded
-            icon="mdi-pencil"
+            icon="mdi-file-outline"
             @click="switchDrawerContext('engagement')"
           >
+            Report
           </q-btn>
           <q-btn
-            color="blue-grey-4"
             rounded
             data-test="to-admin"
             icon="mdi-shield-crown-outline"
             @click="switchDrawerContext('admin')"
-          ></q-btn>
+            >Admin</q-btn
+          >
         </q-btn-group>
       </q-item>
-      <q-separator v-if="isUserAdmin()" class="q-my-sm"></q-separator>
+      <q-separator v-if="isUserAdmin()" class="q-my-md"></q-separator>
       <template v-for="(menuItem, index) in currentMenu" :key="index">
         <q-item
           v-if="menuItem.name"

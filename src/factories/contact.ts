@@ -7,5 +7,5 @@ export const makeFakeContact = (): IContact => {
         last_name: faker.name.lastName(),
         title: faker.name.jobTitle(),
         phone: faker.phone.phoneNumber()
-    }
-}
+    };
+};

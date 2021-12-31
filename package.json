@@ -7,10 +7,10 @@
   "private": true,
   "scripts": {
     "lint": "eslint --ext .js,.ts,.vue ./",
-    "test": "jest",
+    "test": "echo \"See package.json => scripts for available tests.\" && exit 0",
     "test:unit:ui": "majestic",
-    "test:unit": "cypress open-ct",
-    "test:unit:ci": "cypress run-ct",
+    "test:unit": "jest --updateSnapshot",
+    "test:unit:ci": "jest --ci",
     "test:unit:coverage": "jest --coverage",
     "test:config": "jest --showConfig",
     "test:unit:watch": "jest --watch",
@@ -23,12 +23,12 @@
   },
   "dependencies": {
     "@quasar/extras": "^1.0.0",
-    "@types/jest": "^27.0.3",
+    "@vue/test-utils": "^2.0.0-rc.18",
     "axios": "^0.21.4",
     "core-js": "^3.6.5",
     "qrcode": "^1.5.0",
     "quasar": "^2.0.0",
-    "vuex": "^4.0.1"
+    "vuex": "^4.0.2"
   },
   "devDependencies": {
     "@babel/eslint-parser": "^7.13.14",
@@ -36,20 +36,22 @@
     "@quasar/quasar-app-extension-testing": "^2.0.1",
     "@quasar/quasar-app-extension-testing-e2e-cypress": "^4.0.0-beta.8",
     "@quasar/quasar-app-extension-testing-unit-jest": "^3.0.0-alpha.7",
-    "@testing-library/jest-dom": "^5.16.1",
-    "@testing-library/user-event": "^13.5.0",
     "@types/faker": "^5.5.9",
+    "@types/jest": "^26.0.14",
     "@types/node": "^12.20.21",
     "@typescript-eslint/eslint-plugin": "^4.16.1",
     "@typescript-eslint/parser": "^4.16.1",
+    "babel-jest": "^26.5.6",
     "eslint": "^7.14.0",
     "eslint-config-prettier": "^8.1.0",
     "eslint-plugin-cypress": "^2.11.3",
     "eslint-plugin-jest": "^25.2.2",
     "eslint-plugin-vue": "^7.0.0",
     "faker": "^5.5.3",
-    "jest-serializer-vue": "^2.0.2",
-    "majestic": "^1.7.0"
+    "jest": "^26.5.6",
+    "ts-jest": "^26.5.6",
+    "typescript": "^4.3.5",
+    "vue-jest": "^5.0.0-alpha.10"
   },
   "browserslist": [
     "last 10 Chrome versions",

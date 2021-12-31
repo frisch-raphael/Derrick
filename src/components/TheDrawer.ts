@@ -57,14 +57,14 @@ export default defineComponent({
         };
 
         const isUserAdmin = () => {
-            return true
-        }
+            return true;
+        };
 
-        const currentMenu: Ref<MenuElement[]> = ref(engagementMenu)
+        const currentMenu: Ref<MenuElement[]> = ref(engagementMenu);
         // const currentMenu =
         // props.context == 'administration' ? adminMenu : engagementMenu;
         const switchDrawerContext = (context: 'admin' | 'engagement') =>
-            currentMenu.value = context == 'admin' ? adminMenu : engagementMenu
+            currentMenu.value = context == 'admin' ? adminMenu : engagementMenu;
 
         return {
             currentMenu,

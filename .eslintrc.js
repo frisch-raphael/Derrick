@@ -76,6 +76,7 @@ module.exports = {
 
   // add your custom rules here
   rules: {
+    semi: [2, 'always'],
     'prefer-promise-reject-errors': 'off',
     // TypeScript
     '@typescript-eslint/no-explicit-any': 'off',

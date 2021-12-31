@@ -6,6 +6,7 @@
     ],
     "strict": true, // note strict mode, this isn't default
     "baseUrl": ".",
-    "sourceMap": true,
+    "experimentalDecorators": true,
+    "importHelpers": true
   },
 }

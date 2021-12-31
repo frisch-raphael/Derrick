@@ -3,8 +3,8 @@ import { IEngagement } from '../dtos/engagement';
 import { getRandomInt } from './utils';
 import { makeFakeCompany } from './company';
 
-const languages = ['french', 'english']
-const tests = ['Internal pentest', 'Phishing campain', 'Applicat web Contoso']
+const languages = ['french', 'english'];
+const tests = ['Internal pentest', 'Phishing campain', 'Applicat web Contoso'];
 
 export const makeFakeEngagement = (): IEngagement => {
     // const date = Math.random() * 365; 
@@ -17,5 +17,5 @@ export const makeFakeEngagement = (): IEngagement => {
         scoring: getRandomInt(2),
         language: languages[getRandomInt(languages.length)],
         company: makeFakeCompany()
-    }
-}
+    };
+};

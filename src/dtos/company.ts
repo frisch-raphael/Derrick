@@ -6,5 +6,8 @@ export interface ICompany {
     website: string,
     city: string,
     address: string
+}
+
+export interface IAssociatedCompany extends ICompany {
     contacts?: IContact[]
 }
