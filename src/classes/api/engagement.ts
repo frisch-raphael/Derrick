@@ -1,8 +1,7 @@
 import request from 'src/axios';
 import { ApiRessource } from 'src/enums/enums';
-
-
-
+import { Notify } from 'quasar';
+import { AxiosError } from 'axios';
 
 export interface IRestClient {
     // index(): Promise<void>;
@@ -12,25 +11,72 @@ export interface IRestClient {
 }
 
 export default class RestClient implements IRestClient {
-    public ressource: ApiRessource
 
-    constructor(ressource: ApiRessource) {
-        this.ressource = ressource;
+    constructor(private ressource: ApiRessource) {
     }
 
-    // public index() {
-    //     console.log('')
-    // }
+    get ressourceName() {
+        return this.ressource.replace('/', '');
+    }
 
     public async delete(id: number) {
-        await request({ method: 'delete', url: `${this.ressource}/${id}` });
+        try {
+            await request({ method: 'delete', url: `${this.ressource}/${id}` });
+            Notify.create({
+                message: `${this.ressourceName} deleted`,
+                type: 'positive'
+            });
+        } catch (error) {
+            const err = error as AxiosError;
+            Notify.create({
+                message: `${this.ressourceName} deletion failed : ${err.message}`,
+                type: 'negative'
+            });
+            throw error;
+        }
+
     }
 
-    public async update(id: number, post: Record<string, any>) {
-        await request({ method: 'put', url: `${this.ressource}/${id}`, data: post });
+    public async update<T>(id: number, post: Record<string, any>) {
+        try {
+            const ressource = await request<T>({ method: 'put', url: `${this.ressource}/${id}`, data: post });
+            Notify.create({
+                message: `${this.ressourceName} '${this.getName(post)}' updated`,
+                type: 'positive'
+            });
+            return ressource.data;
+        } catch (error) {
+            const err = error as AxiosError;
+            Notify.create({
+                message: `${this.ressourceName} update failed : ${err.message}`,
+                type: 'negative'
+            });
+            throw error;
+        }
+
     }
 
-    public async create(post: Record<string, any>) {
-        await request({ method: 'post', url: `${this.ressource}`, data: post });
+    public async create<T>(post: Record<string, any>) {
+        try {
+            const ressource = await request<T>({ method: 'post', url: `${this.ressource}`, data: { engagement: post } });
+            Notify.create({
+                message: `${this.ressourceName} '${this.getName(post)}' created`,
+                type: 'positive'
+            });
+            return ressource.data;
+        } catch (error) {
+            const err = error as AxiosError;
+            Notify.create({
+                message: `${this.ressourceName} creation failed : ${err.message}`,
+                type: 'negative'
+            });
+            throw error;
+        }
     }
+
+    private getName(post: Record<string, string>) {
+        return post.title ?? post.name ?? '';
+    }
+
+
 }

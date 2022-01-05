@@ -1,23 +1,21 @@
 import { describe, expect, it, jest } from '@jest/globals';
 import { installQuasarPlugin } from '@quasar/quasar-app-extension-testing-unit-jest';
 import EngagementTable from 'src/pages/EngagementTable';
-import { makeFakeEngagement } from 'src/factories/engagement';
+import { makeFakeEngagement, makeFakeEngagements } from 'src/factories/engagement';
 import { IEngagement } from 'src/dtos/engagement';
 import request from 'src/axios';
 import { mountSuspense } from '../../utils';
 import RessourceForm from 'src/components/RessourceForm.vue';
-import { createStore } from 'vuex';
-import { Store } from 'src/store';
-import { ColumboState } from 'src/store/columbo/state';
-import { storeKey, State, useStore } from 'src/store/index';
-import { flushPromises } from '@vue/test-utils';
+import { storeKey } from 'src/store/index';
 import store from 'src/store/index';
+import { ApiRessource } from 'src/enums/enums';
+import { RessourceName } from 'src/enums/enums';
 // // Specify here Quasar config you'll need to test your component
-installQuasarPlugin();
 
-let engagementNumber = 3;
-const mockEngagements: IEngagement[] = [];
-while (engagementNumber--) mockEngagements[engagementNumber] = makeFakeEngagement();
+// const store = useStore();
+installQuasarPlugin();
+const engagementNumber = 3;
+const mockEngagements: IEngagement[] = makeFakeEngagements(engagementNumber);
 const mockResponse = Promise.resolve({ data: mockEngagements });
 
 jest.mock('src/axios', () => ({
@@ -33,22 +31,23 @@ const wrapperToAwait = async () => {
         }
     });
     return wrapper.findComponent(EngagementTable);
+
 };
 
 describe('the engagement table', () => {
 
 
     it('load engagements on mount', async () => {
-        const wrapper = await wrapperToAwait();
+        await wrapperToAwait();
         expect(request).toHaveBeenCalledTimes(1);
-        expect(request).toHaveBeenCalledWith({ method: 'get', url: '/engagements' });
-        expect(wrapper.vm.engagementsRows).toHaveLength(3);
+        expect(request).toHaveBeenCalledWith({ method: 'get', url: ApiRessource.Engagement });
+        expect(store.getters.baseTableRows(RessourceName.Engagement)).toHaveLength(3);
     });
 
     it('display first engagement rows in html', async () => {
         const engagementTable = await wrapperToAwait();
 
-        const testEngagement = engagementTable.vm.engagementsRows[1];
+        const testEngagement = mockEngagements[0];
         const valuesThatShouldBeInHtml = [
             testEngagement.title,
             testEngagement.end_date,
@@ -61,12 +60,11 @@ describe('the engagement table', () => {
     it('can navigate to RessourceForm', async () => {
 
         const engagementTable = await wrapperToAwait();
-
-        const menuButton = engagementTable.find("[data-test='menu-btn']");
+        const menuButton = engagementTable.find("[data-cy='open-menu-btn']");
         expect(menuButton.exists()).toBe(true);
 
         await menuButton.trigger('click');
-        const createButton = engagementTable.findComponent("[data-test='add']");
+        const createButton = engagementTable.findComponent("[data-cy='add']");
         expect(createButton.exists()).toBe(true);
 
         await (createButton as unknown as { trigger: (x: string) => Promise<void> }).trigger('click');
@@ -75,4 +73,25 @@ describe('the engagement table', () => {
 
     });
 
+
+    it('add to store when engagement created', async () => {
+
+        const engagementTable = await wrapperToAwait();
+        const menuButton = engagementTable.find("[data-cy='open-menu-btn']");
+
+        await menuButton.trigger('click');
+        const openCreateButton = engagementTable.findComponent("[data-cy='add']");
+
+        await (openCreateButton as unknown as { trigger: (x: string) => Promise<void> }).trigger('click');
+        const ressourceForm = engagementTable.findComponent(RessourceForm);
+
+        // const aavar = engagementTable.html();
+        // const baseDialog = engagementTable.findComponent(BaseDialog);
+        ressourceForm.vm.$emit('ressource-form-update', mockEngagements[0]);
+        const createBtn = engagementTable.findComponent("[data-cy='engagement-create-btn']");
+        const engagementInStoreBefore = store.getters.baseTableRows(RessourceName.Engagement).length;
+        await (createBtn as unknown as { trigger: (x: string) => Promise<void> }).trigger('click');
+        const engagementInStoreAfter = store.getters.baseTableRows(RessourceName.Engagement).length;
+        expect(engagementInStoreAfter).toBe(engagementInStoreBefore + 1);
+    });
 });

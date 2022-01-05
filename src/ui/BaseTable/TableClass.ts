@@ -1,54 +1,38 @@
 import { CardAction } from 'src/types/types';
-import { Notify } from 'quasar';
-import { Row } from 'src/types/types';
 import { IRestClient } from 'src/classes/api/engagement';
 import { HeaderAction } from 'src/types/types';
+import { MutationType } from 'src/store/columbo/mutations-types';
+import { RessourceName } from 'src/enums/enums';
+import { Store } from 'src/store/index';
 
 export class Table {
     private restClient: IRestClient
-    private state: { rows: Row[] }
     private ressourceName: string
-    private emit: (event: 'add' | 'delete' | 'update', ...args: any[]) => void
 
     constructor(
-        state: { rows: Row[] },
         props: { restclient?: IRestClient, ressourceName: string } & Record<string, any>,
-        emit: (event: 'add' | 'delete' | 'update', ...args: any[]) => void) {
+        private emit: (event: 'add', ...args: any[]) => void,
+        private store: Store) {
         const { restClient } = props;
         if (!restClient) throw 'restClient is undefined';
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         this.restClient = restClient;
-        this.state = state;
         this.ressourceName = props.ressourceName;
         this.emit = emit;
     }
 
     private async deleteRowInTableAndBackend(id: number) {
         try {
+            this.store.commit(MutationType.destroyOneRessourceTable, { ressource: RessourceName.Engagement, id: id });
             await this.restClient.delete(id);
-            this.state.rows = this.state.rows.filter(r => r.id != id);
-            Notify.create({
-                message: this.ressourceName + ' deleted', type: 'positive'
-            });
-            // emit('deleteRow')
-        } catch (error) {
-            console.error('could not delete ressource with id:' + id.toString());
-            Notify.create({ message: 'Could not delete ' + this.ressourceName, type: 'negative' });
+        } catch (err) {
+            console.error('could not delete ressource');
         }
+
     }
 
     private async postRowToBackend(id: number, payload: Record<string, any>) {
-        try {
-            await this.restClient.update(id, payload);
-            // this.state.rows = this.state.rows.filter(r => r.id != id)
-            Notify.create({
-                message: this.ressourceName + ' deleted', type: 'positive'
-            });
-            // emit('deleteRow')
-        } catch (error) {
-            console.error('could not delete ressource with id:' + id.toString());
-            Notify.create({ message: 'Could not delete ' + this.ressourceName, type: 'negative' });
-        }
+        await this.restClient.update(id, payload);
     }
 
     // private addRowToTable(id: number, payload: Record<string, any>) {

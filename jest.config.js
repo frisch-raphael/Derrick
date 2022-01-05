@@ -2,7 +2,6 @@ const esModules = ['quasar', 'quasar/lang', 'lodash-es'].join('|');
 
 /* eslint-env node */
 module.exports = {
-  testEnvironment: 'jsdom',
   globals: {
     __DEV__: true,
     // TODO: Remove if resolved natively

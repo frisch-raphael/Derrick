@@ -15,7 +15,15 @@ export const makeFakeEngagement = (): IEngagement => {
         start_date: faker.date.past(),
         end_date: faker.date.past(),
         scoring: getRandomInt(2),
+        state: getRandomInt(2),
         language: languages[getRandomInt(languages.length)],
         company: makeFakeCompany()
     };
+};
+
+export const makeFakeEngagements = (engagementNumber: number): IEngagement[] => {
+    // const date = Math.random() * 365; 
+    const mockEngagements: IEngagement[] = [];
+    while (engagementNumber--) mockEngagements[engagementNumber] = makeFakeEngagement();
+    return mockEngagements;
 };

@@ -1,15 +1,17 @@
 <script setup lang="ts">
 import { ref } from 'vue';
+
 defineProps<{
   icon: string;
 }>();
+
 const model = ref('');
 </script>
 
 <template>
-  <q-input v-model="model" data-cy="input-form">
+  <q-select v-model="model" data-cy="select-form">
     <template #prepend>
       <q-icon :name="icon" />
     </template>
-  </q-input>
+  </q-select>
 </template>

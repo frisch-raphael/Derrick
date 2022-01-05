@@ -1,3 +1,5 @@
 export enum ActionType {
-    updateRessourceMenu = 'UPDATE_RESSOURCE_MENU'
+    updateRessourceMenu = 'UPDATE_RESSOURCE_MENU',
+    updateRessourceTable = 'UPDATE_RESSOURCE_TABLE',
+
 }

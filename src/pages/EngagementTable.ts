@@ -2,7 +2,6 @@ import { defineComponent, ref, Ref } from 'vue';
 import { IEngagement } from 'src/dtos/engagement';
 import request from 'src/axios';
 import BaseTable from 'src/ui/BaseTable/BaseTable.vue';
-import { Column } from 'src/types/types';
 import RestClient from '../classes/api/engagement';
 import BaseDialog from 'src/ui/BaseDialog.vue';
 import { engagementForm } from '../forms/engagement';
@@ -10,6 +9,9 @@ import RessourceForm from 'src/components/RessourceForm.vue';
 import { ApiRessource, RessourceName } from 'src/enums/enums';
 import { useStore } from 'src/store';
 import { MutationType } from '../store/columbo/mutations-types';
+import { EngagementState } from '../enums/enums';
+import { ActionType } from '../store/columbo/action-types';
+import { engagementColumns } from 'src/pages/columns';
 
 export default defineComponent({
     name: 'EngagementTable',
@@ -18,53 +20,49 @@ export default defineComponent({
         RessourceForm,
         BaseDialog
     },
-    props: {
-        test: {
-            type: String,
-            default: ''
-        }
-    },
     async setup() {
         const store = useStore();
 
         const isCreateEngagementOpen = ref(false);
+        const engagementToCreate: Ref<Partial<IEngagement> & { title: string }> = ref({ title: '' });
         const engagementRestClient = new RestClient(ApiRessource.Engagement);
-        type EngagementColumn = { name: keyof IEngagement } & Column<IEngagement>
-        let engagements: IEngagement[] = [];
-        type engagementRow = { name: string } & Partial<IEngagement>
-        const engagementsRows: Ref<engagementRow[]> = ref([]);
-        const engagementColumns: EngagementColumn[] = [
-            {
-                name: 'title', field: 'title', label: 'Title', required: true
-            }, {
-                name: 'assessment_type', field: 'assessment_type', label: 'Assessment Type', required: true
-            }, {
-                name: 'start_date', field: 'start_date', label: 'Start date'
-            }, {
-                name: 'end_date', field: 'end_date', label: 'End date'
-            }, {
-                name: 'language', field: 'language', label: 'Language', required: true
-            }];
+        const engagements: Ref<IEngagement[]> = ref([]);
 
         const response = await request<IEngagement[]>({ method: 'get', url: '/engagements' });
-        engagements = response.data;
-        engagementsRows.value = engagements.map((e, i) => ({
+        engagements.value = response.data;
+
+        const engagementsRowsFromBackend = engagements.value.map((e, i) => ({
             name: `Engagement ${i + 1}`,
             ...e
         }));
 
-        const hideAll = () => {
+        await store.dispatch(ActionType.updateRessourceTable,
+            { ressource: RessourceName.Engagement, rows: engagementsRowsFromBackend }
+        );
+
+        const reinit = () => {
             store.commit(MutationType.updateRessourceMenu, { ressource: RessourceName.Engagement, isOpen: false });
             isCreateEngagementOpen.value = false;
+            engagementToCreate.value = { title: '', state: EngagementState.Ongoing };
+        };
+        const updateEngagementToCreate = (engagement: IEngagement) =>
+            engagementToCreate.value = { ...engagement, state: EngagementState.Ongoing };
+        const createEngagement = async () => {
+            const engagementFromBackend = await new RestClient(ApiRessource.Engagement).create<IEngagement>(engagementToCreate.value);
+            const engagementRowNumber = store.getters.baseTableRows(RessourceName.Engagement).length;
+            const newEngagementRow = { ...engagementFromBackend, name: `Engagement ${engagementRowNumber + 1}` };
+            store.commit(MutationType.addOneRessourceTable, { ressource: RessourceName.Engagement, row: newEngagementRow });
+            reinit();
         };
 
         return {
-            engagementsRows,
             engagementColumns,
             engagementRestClient,
             isCreateEngagementOpen,
             engagementForm,
-            hideAll
+            hideAll: reinit,
+            createEngagement,
+            updateEngagementToCreate
         };
     },
 

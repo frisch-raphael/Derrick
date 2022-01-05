@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 import { defineComponent, PropType } from 'vue';
-import { TableItem, CardAction as CardAction } from 'src/types/types';
+import { TableItem, CardAction } from 'src/types/types';
 import { LooseDictionary } from 'src/types/types';
 
 export default defineComponent({

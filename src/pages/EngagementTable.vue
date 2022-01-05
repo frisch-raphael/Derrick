@@ -3,10 +3,8 @@
 <template>
   <base-table
     :columns="engagementColumns"
-    :p-rows="engagementsRows"
     ressource-name="engagement"
     :rest-client="engagementRestClient"
-    :p-is-header-menu-open="isHeaderMenuOpen"
     @add="isCreateEngagementOpen = true"
   >
     <template #card-buttons>
@@ -19,6 +17,18 @@
     :model-value="isCreateEngagementOpen"
     @before-hide="hideAll()"
   >
-    <ressource-form :ressource="engagementForm"></ressource-form>
+    <ressource-form
+      :ressource-form-config="engagementForm"
+      @ressource-form-update="updateEngagementToCreate"
+    ></ressource-form>
+    <template #actions>
+      <q-btn
+        data-cy="engagement-create-btn"
+        color="primary"
+        flat
+        @click="createEngagement()"
+        >Create</q-btn
+      >
+    </template>
   </base-dialog>
 </template>

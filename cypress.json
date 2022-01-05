@@ -1,4 +1,5 @@
 {
+  "defaultCommandTimeout": 4000,
   "baseUrl": "http://localhost:8080/",
   "fixturesFolder": "test/cypress/fixtures",
   "integrationFolder": "test/cypress/integration",
@@ -7,6 +8,8 @@
   "supportFile": "test/cypress/support/index.ts",
   "videosFolder": "test/cypress/videos",
   "video": true,
+  "componentFolder": "test/cypress/components",
+
   "component": {
     "componentFolder": "src",
     "testFiles": "**/*.spec.ts",

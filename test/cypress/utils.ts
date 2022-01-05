@@ -1,1 +1,1 @@
-export const t = (string: string) => `[data-test=${string}]`;
+export const t = (string: string) => `[data-test=${string}]`; 

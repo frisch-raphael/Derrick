@@ -1,35 +1,35 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-const props = defineProps<{
-  label: string;
+defineProps<{
+  icon: string;
 }>();
 
-const date = ref(new Date());
-const proxyDate = ref(new Date());
-const updateProxy = () => {
-  proxyDate.value = date.value;
-};
-const save = () => {
-  date.value = proxyDate.value;
-};
+const date = ref('');
 </script>
 
 <template>
-  <q-btn color="primary" class="q-my-sm">
-    <q-popup-proxy
-      cover
-      transition-show="scale"
-      transition-hide="scale"
-      @before-show="updateProxy"
-    >
-      <q-date v-model="proxyDate">
-        <div class="row items-center justify-end q-gutter-sm">
-          <q-btn v-close-popup label="Cancel" color="primary" flat />
-          <q-btn v-close-popup label="OK" color="primary" flat @click="save" />
-        </div>
-      </q-date>
-    </q-popup-proxy>
-    {{ props.label }}
-  </q-btn>
-  <br />
+  <q-input
+    v-model="date"
+    mask="date"
+    :rules="['date']"
+    data-cy="date-form"
+    class="q-pb-none"
+  >
+    <template #prepend>
+      <q-icon name="event" class="cursor-pointer" color="primary">
+        <q-popup-proxy
+          ref="qDateProxy"
+          cover
+          transition-show="scale"
+          transition-hide="scale"
+        >
+          <q-date v-model="date" minimal>
+            <div class="row items-center justify-end">
+              <q-btn v-close-popup label="Close" color="primary" flat />
+            </div>
+          </q-date>
+        </q-popup-proxy>
+      </q-icon>
+    </template>
+  </q-input>
 </template>

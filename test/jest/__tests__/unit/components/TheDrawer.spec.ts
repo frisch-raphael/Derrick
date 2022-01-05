@@ -8,10 +8,10 @@ import TheDrawer from 'src/components/TheDrawer';
 // // Specify here Quasar config you'll need to test your component
 installQuasarPlugin();
 
-const engagementMenuElementSelector = "[data-test='Findings']";
-const adminMenuElementSelector = "[data-test='Configuration']";
-const toAdminElementSelector = "[data-test='to-admin']";
-const toEngagementsElementSelector = "[data-test='Other engagements']";
+const engagementMenuElementSelector = "[data-cy='Findings']";
+const adminMenuElementSelector = "[data-cy='Configuration']";
+const toAdminElementSelector = "[data-cy='to-admin']";
+const toEngagementsElementSelector = "[data-cy='Other engagements']";
 
 describe('TheDrawer', () => {
 
@@ -46,7 +46,7 @@ describe('TheDrawer', () => {
 
   it('can switch from administration to engagements', () => {
     const wrapper = mount(TheDrawer);
-    const engagementButtonSwitcher = wrapper.findComponent("[data-test='to-engagement']");
+    const engagementButtonSwitcher = wrapper.findComponent("[data-cy='to-engagement']");
     // expect(wrapper.findComponent(QItem).exists()).toBe(true);
     expect(engagementButtonSwitcher.exists()).toBe(true);
     wrapper.vm.switchDrawerContext('engagement');

@@ -7,6 +7,7 @@
     dense
     debounce="300"
     placeholder="Search"
+    data-cy="search-input"
   >
     <template #append>
       <q-icon name="search" />

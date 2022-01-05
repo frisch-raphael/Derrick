@@ -1,4 +1,3 @@
-import { store } from 'quasar/wrappers';
 import { InjectionKey } from 'vue';
 import columbo from './columbo';
 import {
@@ -86,7 +85,7 @@ export default createStore<State>({
   // enable strict mode (adds overhead!)
   // for dev mode and --debug builds only
   strict: !!process.env.DEBUGGING
-});
+}) as Store;
 
 export function useStore() {
   return vuexUseStore(storeKey) as Store;

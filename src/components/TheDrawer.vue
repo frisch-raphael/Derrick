@@ -6,7 +6,7 @@
       <q-item v-if="isUserAdmin()">
         <q-btn-group rounded class="absolute-center q-ma-xs">
           <q-btn
-            data-test="to-engagement"
+            data-cy="to-engagement"
             rounded
             icon="mdi-file-outline"
             @click="switchDrawerContext('engagement')"
@@ -15,7 +15,7 @@
           </q-btn>
           <q-btn
             rounded
-            data-test="to-admin"
+            data-cy="to-admin"
             icon="mdi-shield-crown-outline"
             @click="switchDrawerContext('admin')"
             >Admin</q-btn
@@ -36,7 +36,7 @@
           </q-item-section>
           <q-item-section
             v-if="menuItem.name"
-            :data-test="menuItem.name"
+            :data-cy="menuItem.name"
             :class="getDrawerTitleClasses(menuItem.isTitle)"
           >
             <router-link v-if="menuItem.goto" :to="{ name: menuItem.goto }">
