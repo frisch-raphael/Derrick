@@ -1,15 +1,16 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, toRef, reactive } from 'vue';
 
-defineProps<{
+const props = defineProps<{
   icon: string;
+  default: string;
 }>();
 
-const model = ref('');
+const state = reactive({ model: props.default });
 </script>
 
 <template>
-  <q-select v-model="model" data-cy="select-form">
+  <q-select v-model="state.model" data-cy="select-form">
     <template #prepend>
       <q-icon :name="icon" />
     </template>

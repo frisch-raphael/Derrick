@@ -1,6 +1,6 @@
 import faker from 'faker';
-import { IEngagement } from '../dtos/engagement';
-import { getRandomInt } from './utils';
+import { IEngagement } from 'src/dtos/engagement';
+import { getRandomInt } from 'src/utils';
 import { makeFakeCompany } from './company';
 
 const languages = ['french', 'english'];

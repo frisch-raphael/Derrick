@@ -6,6 +6,7 @@ type RessourceFormParams = {
     component: FormComponent,
     attrs?: Record<string, any>,
     icon?: string,
+    default?: string,
 }
 
 export type RessourceFormType<T> = {

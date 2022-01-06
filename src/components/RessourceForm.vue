@@ -4,11 +4,19 @@ import { prettyVariable } from '../utils';
 import { DataTest } from 'src/enums/enums';
 import { toRefs } from 'vue';
 
-defineProps<{
+const props = defineProps<{
   ressourceFormConfig: RessourceFormGeneric;
 }>();
-const emit = defineEmits(['ressourceFormUpdate']);
 const ressourceTosubmit: Record<string, any> = toRefs({});
+const emit = defineEmits(['ressourceFormUpdate']);
+
+const initDefaultValue = () => {
+  for (const param in props.ressourceFormConfig) {
+    ressourceTosubmit[param] = props.ressourceFormConfig[param].default;
+  }
+};
+initDefaultValue();
+
 const updateForm = (param: string, value: string) => {
   ressourceTosubmit[param] = value;
   emit('ressourceFormUpdate', ressourceTosubmit);
@@ -25,6 +33,7 @@ const updateForm = (param: string, value: string) => {
       :label="prettyVariable(param)"
       :icon="config.icon"
       :data-test="`form-${param}`"
+      :default="config.default"
       @update:modelValue="updateForm(param, $event)"
     >
     </component>

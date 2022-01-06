@@ -1,9 +1,10 @@
 <script lang="ts" setup>
-import { Table } from 'src/ui/BaseTable/TableClass';
 import { ref, Ref } from 'vue';
 import SearchInput from 'src/ui/SearchInput.vue';
 import BaseTableCard from './BaseTableCard/BaseTableCard.vue';
 import BaseTableHeaderMenu from 'src/ui/BaseTable/BaseTableHeaderMenu/BaseTableHeaderMenu.vue';
+import CreateRessourceDialog from 'src/ui/BaseTable/CreateRessourceDialog.vue';
+import { Table } from 'src/ui/BaseTable/TableClass';
 import { IRestClient } from 'src/classes/api/engagement';
 import { Columns, CardAction, HeaderAction, Row } from 'src/types/types';
 import { RessourceName } from 'src/enums/enums';
@@ -36,7 +37,7 @@ const selected: Ref<Row[]> = ref([]);
 const allCardActions = props.cardActions.concat(defaultCardActions);
 const allHeaderActions = props.headerActions.concat(defaultHeaderActions);
 
-const allSelectedAllClicked = (checked: boolean) => {
+const selectAllClicked = (checked: boolean) => {
   selected.value = checked
     ? store.getters.baseTableRows(RessourceName.Engagement)
     : [];
@@ -62,9 +63,10 @@ const allSelectedAllClicked = (checked: boolean) => {
 
       <template #top-left>
         <base-table-header-menu
+          :selected="selected"
           :ressource-name="ressourceName"
           :actions="allHeaderActions"
-          @all-selected="allSelectedAllClicked"
+          @all-selected="selectAllClicked"
         ></base-table-header-menu>
       </template>
 
@@ -87,5 +89,9 @@ const allSelectedAllClicked = (checked: boolean) => {
         No {{ ressourceName }} found ! Create one from the menu.
       </q-banner>
     </q-markup-table>
+
+    <create-ressource-dialog
+      :ressource-name="props.ressourceName"
+    ></create-ressource-dialog>
   </div>
 </template>

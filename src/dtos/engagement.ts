@@ -13,3 +13,19 @@ export interface IEngagement {
     state: EngagementState
     company?: ICompany
 }
+
+export class Engagement implements IEngagement {
+
+    public id = 0;
+    public title = ''
+    public assessment_type = ''
+    public start_date = new Date()
+    public end_date = new Date()
+    public scoring = 0
+    public language = ''
+    public state = 0
+
+    constructor(params: Record<string, any>) {
+        Object.assign(this, params);
+    }
+}

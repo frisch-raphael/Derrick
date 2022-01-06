@@ -5,9 +5,8 @@ import { DataTest, RessourceName } from 'src/enums/enums';
 import RestClient from 'src/classes/api/engagement';
 import { storeKey } from 'src/store';
 import store from 'src/store/index';
-import { MutationType } from '../../store/columbo/mutations-types';
-import { ApiRessource } from '../../enums/enums';
-import { t } from 'app/test/cypress/utils';
+import { MutationType } from 'src/store/columbo/mutations-types';
+import { ApiRessource } from 'src/enums/enums';
 // const mockedRestClient = mocked(RestClient, true)
 // Specify here Quasar config you'll need to test your component
 
@@ -84,8 +83,13 @@ describe('The BaseTable', () => {
         cy.dataCy('no-data').should('exist');
     });
 
+    it('"delete all" disabled if nothing checked', () => {
+        cy.dataCy(DataTest.RessourceTableOpenHeaderMenuBtn).click().then(() => {
+            cy.dataCy(DataTest.RessourceTableHeaderDeleteAll).should('have.class', 'disabled');
+        });
+    });
 
-    it('can select all cards at once', () => {
+    it('can select/unselect all ressources at once', () => {
 
         cy.dataCy(DataTest.RessourceTableSelectAll).click().then(() => {
             cy.dataCy(DataTest.RessourceTableCardCheckbox).should((card) => {
@@ -93,34 +97,30 @@ describe('The BaseTable', () => {
                 expect(isChecked).to.be.equal('true');
             });
         });
-    });
-
-    it('can delete all cards at once', () => {
-
-        cy.dataCy(DataTest.RessourceTableOpenHeaderMenuBtn).click().then(() => {
-            cy.dataCy(DataTest.RessourceTableHeaderDeleteAll).click().then(() => {
-                cy.dataCy(DataTest.RessourceTableCard).should('be.empty');
+        cy.dataCy(DataTest.RessourceTableSelectAll).click().then(() => {
+            cy.dataCy(DataTest.RessourceTableCardCheckbox).should((card) => {
+                const isChecked = card.attr('aria-checked');
+                expect(isChecked).to.be.equal('false');
             });
         });
     });
-    // it('can create new ressource', () => {
 
-    //     cy.dataCy(DataTest.BaseTableCard).then((originalCards) => {
-    //         cy.dataCy(DataTest.BaseTableOpenHeaderMenuBtn).click();
-    //         cy.dataCy('add').click();
-    //         const engagementTitle = 'Test interne société Contos';
-    //         cy.get(t('form-title')).type(engagementTitle);
-    //         cy.dataCy(DataTest.EngagementCreateBtn).click().then(() => {
-    //             const numberOfEngagementBefore = originalCards.length;
-    //             cy.dataCy(DataTest.DialogBase).should('not.exist');
-    //             cy.get('.bg-positive.q-notification').should('exist');
-    //             cy.dataCy(DataTest.BaseTableCard).should('have.length', numberOfEngagementBefore + 1);
-    //             (cy.dataCy(DataTest.BaseTableCard).first()).should('contain.text', `engagement ${numberOfEngagementBefore + 1}`);
-    //             cy.contains(engagementTitle).should('exist');
+    it('can delete all cards at once', () => {
+        cy.dataCy(DataTest.RessourceTableSelectAll).click();
+        cy.dataCy(DataTest.RessourceTableOpenHeaderMenuBtn).click().then(() => {
+            cy.dataCy(DataTest.RessourceTableHeaderDeleteAll).click().then(() => {
+                cy.dataCy(DataTest.RessourceTableCard).should('not.exist');
+            });
+        });
+    });
 
-    //         });
+    it('can update a ressource', () => {
+        cy.dataCy(DataTest.RessourceTableSelectAll).click();
+        cy.dataCy(DataTest.RessourceTableOpenHeaderMenuBtn).click().then(() => {
+            cy.dataCy(DataTest.RessourceTableHeaderDeleteAll).click().then(() => {
+                cy.dataCy(DataTest.RessourceTableCard).should('not.exist');
+            });
+        });
+    });
 
-    //         // cy.get(FullDataTest(DataTest.RessourceForm)).click();
-    //     });
-    // });
 });

@@ -150,10 +150,13 @@ type FunctionCardAction = {
 
 type FunctionHeaderdAction = {
     function: () => void,
-    isRowsNeeded: false
+    params: 'none'
 } | {
     function: (rows: Record<string, any>[]) => void,
-    isRowsNeeded: true
+    params: 'rows'
+} | {
+    function: (ids: number[]) => void,
+    params: 'ids'
 }
 
 

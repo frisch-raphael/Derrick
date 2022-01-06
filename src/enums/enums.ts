@@ -4,15 +4,15 @@ export enum Scoring {
 }
 
 export enum EngagementState {
-    Ongoing,
-    Done,
-    Archived,
+    Ongoing = 'Ongoing',
+    Done = 'Done',
+    Archived = 'Archived',
 }
 
 export enum RessourceName {
     Engagement = 'engagement',
     Contact = 'contact',
-    Company = 'companie'
+    Company = 'company'
 }
 
 export enum ApiRessource {
@@ -20,6 +20,8 @@ export enum ApiRessource {
     Contact = '/contacts',
     Company = '/companies'
 }
+
+
 
 export enum DataTest {
     DialogBase = 'base-dialog',
@@ -34,6 +36,7 @@ export enum DataTest {
     RessourceTableCreateBtn = 'engagement-create-btn',
     RessourceTableCard = 'base-table-card',
     RessourceTableCardDeleteBtn = 'table-card-action-remove',
+    RessourceTableCardUpdateBtn = 'table-card-action-update',
     RessourceTableCardSaveBtn = 'table-card-action-save',
     RessourceTableCardCheckbox = 'base-table-card-checkbox',
     EngagementFormStartDate = 'form-start_date',

@@ -4,13 +4,15 @@ import { HeaderAction } from 'src/types/types';
 import { MutationType } from 'src/store/columbo/mutations-types';
 import { RessourceName } from 'src/enums/enums';
 import { Store } from 'src/store/index';
+import { DataTest } from 'src/enums/enums';
+import { AxiosError } from 'axios';
 
 export class Table {
     private restClient: IRestClient
-    private ressourceName: string
+    private ressourceName: RessourceName
 
     constructor(
-        props: { restclient?: IRestClient, ressourceName: string } & Record<string, any>,
+        props: { restclient?: IRestClient, ressourceName: RessourceName } & Record<string, any>,
         private emit: (event: 'add', ...args: any[]) => void,
         private store: Store) {
         const { restClient } = props;
@@ -21,17 +23,21 @@ export class Table {
         this.emit = emit;
     }
 
-    private async deleteRowInTableAndBackend(id: number) {
+    private async deleteRowsInTableAndBackend(ids: number[] | number) {
         try {
-            this.store.commit(MutationType.destroyOneRessourceTable, { ressource: RessourceName.Engagement, id: id });
-            await this.restClient.delete(id);
+            if (typeof ids === 'number') ids = [ids];
+            this.store.commit(MutationType.destroyRessourceTable, { ressource: RessourceName.Engagement, ids: ids });
+            await this.restClient.delete(ids);
         } catch (err) {
-            console.error('could not delete ressource');
+            const error = err as AxiosError;
+            console.error('could not delete ressource:' + error.message);
         }
 
     }
 
-    private async postRowToBackend(id: number, payload: Record<string, any>) {
+
+
+    private async editRessource(id: number, payload: Record<string, any>) {
         await this.restClient.update(id, payload);
     }
 
@@ -42,7 +48,7 @@ export class Table {
     private getDefaultCardActions(): CardAction[] {
         return [
             {
-                function: (id: number) => this.deleteRowInTableAndBackend(id),
+                function: (id: number) => this.deleteRowsInTableAndBackend(id),
                 isRessourcePayloadNeed: false,
                 icon: 'mdi-delete',
                 color: 'red',
@@ -50,12 +56,12 @@ export class Table {
                 name: 'remove'
             },
             {
-                function: (id: number, payload: Record<string, any>) => this.postRowToBackend(id, payload),
+                function: (id: number, payload: Record<string, any>) => this.editRessource(id, payload),
                 isRessourcePayloadNeed: true,
-                icon: 'mdi-content-save',
+                icon: 'mdi-pencil',
                 color: 'green',
-                tooltip: 'Save',
-                name: 'save'
+                tooltip: 'Edit',
+                name: 'update'
             }
         ];
     }
@@ -63,11 +69,18 @@ export class Table {
     private getDefaultHeaderActions(): HeaderAction[] {
         return [
             {
-                function: () => this.emit('add'),
-                isRowsNeeded: false,
+                function: () => this.store.commit(MutationType.updateCreateRessourceDialog, { isOpen: true, ressource: this.ressourceName }),
+                params: 'none',
                 icon: 'mdi-plus',
                 datatest: 'add',
                 name: 'Create new ' + this.ressourceName
+            },
+            {
+                function: (id: number[]) => this.deleteRowsInTableAndBackend(id),
+                params: 'ids',
+                icon: 'mdi-delete',
+                datatest: DataTest.RessourceTableHeaderDeleteAll,
+                name: 'Delete selected'
             }
         ];
     }

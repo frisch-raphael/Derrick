@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, ref, Ref } from 'vue';
 import { useStore } from 'src/store';
-import { HeaderAction } from 'src/types/types';
+import { HeaderAction, Row } from 'src/types/types';
 import { MutationType } from 'src/store/columbo/mutations-types';
 import { RessourceName, DataTest } from 'src/enums/enums';
 const store = useStore();
@@ -10,6 +10,7 @@ const emit = defineEmits(['all-selected']);
 const props = defineProps<{
   ressourceName: RessourceName;
   actions: HeaderAction[];
+  selected: Row[];
 }>();
 
 const menuState = computed({
@@ -25,7 +26,14 @@ const menuState = computed({
 });
 
 const launchAction = (headerAction: HeaderAction) => {
-  headerAction.isRowsNeeded || headerAction.function();
+  if (headerAction.params === 'none') headerAction.function();
+  else if (headerAction.params === 'ids')
+    headerAction.function(props.selected.map((r) => r.id));
+};
+const isDisabled = (headerAction: HeaderAction): boolean => {
+  if (headerAction.params === 'ids')
+    return !props.selected.map((r) => r.id).length;
+  else return false;
 };
 const selectAll = ref(false);
 </script>
@@ -46,12 +54,15 @@ const selectAll = ref(false);
   >
     <q-menu v-model="menuState">
       <q-list>
-        <q-item v-for="action in actions" :key="action.name" clickable>
-          <q-item-section
-            :data-cy="action.datatest"
-            @click="launchAction(action)"
-            >{{ action.name }}</q-item-section
-          >
+        <q-item
+          v-for="action in actions"
+          :key="action.name"
+          :clickable="!isDisabled(action)"
+          :disable="isDisabled(action)"
+          :data-cy="action.datatest"
+          @click="launchAction(action)"
+        >
+          <q-item-section>{{ action.name }}</q-item-section>
         </q-item>
       </q-list>
     </q-menu>

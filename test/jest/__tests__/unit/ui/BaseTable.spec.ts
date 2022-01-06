@@ -71,7 +71,7 @@ describe('a BaseTable', () => {
   });
 
   it('has default actions on its cards', () => {
-    const saveButton = wrapper.findComponent("[data-cy='" + DataTest.RessourceTableCardSaveBtn + "']");
+    const saveButton = wrapper.findComponent("[data-cy='" + DataTest.RessourceTableCardUpdateBtn + "']");
     expect(saveButton.exists()).toBe(true);
     const removeButton = wrapper.findComponent("[data-cy='" + DataTest.RessourceTableCardDeleteBtn + "']");
     expect(removeButton.exists()).toBe(true);

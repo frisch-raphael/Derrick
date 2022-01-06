@@ -1,11 +1,11 @@
 import request from 'src/axios';
-import { ApiRessource } from 'src/enums/enums';
 import { Notify } from 'quasar';
 import { AxiosError } from 'axios';
+import { ApiRessource } from 'src/enums/enums';
 
 export interface IRestClient {
     // index(): Promise<void>;
-    delete(id: number): Promise<void>;
+    delete(id: number[]): Promise<void>;
     update(id: number, payload: Record<string, any>): Promise<void>;
     create(payload: Record<string, any>): Promise<void>;
 }
@@ -16,12 +16,12 @@ export default class RestClient implements IRestClient {
     }
 
     get ressourceName() {
-        return this.ressource.replace('/', '');
+        return this.ressource.replace('/', '').slice(0, -1);
     }
 
-    public async delete(id: number) {
+    public async delete(id: number[]) {
         try {
-            await request({ method: 'delete', url: `${this.ressource}/${id}` });
+            await request({ method: 'delete', url: `${this.ressource}/${id.join(',')}` });
             Notify.create({
                 message: `${this.ressourceName} deleted`,
                 type: 'positive'
