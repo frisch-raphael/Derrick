@@ -3,7 +3,7 @@ import { Mutations } from 'src/store/columbo/mutations';
 import { ActionTree, ActionContext } from 'vuex';
 import { State } from '../index';
 import { ColumboState } from './state';
-import { HeaderMenuStateUpdate, RessourceTableUpdate } from './types';
+import { OpenStateUpdate, RessourceTableUpdate } from './types';
 import { MutationType } from './mutations-types';
 // type Context = ActionContext<ColumboStateInterface, State>;
 
@@ -17,7 +17,7 @@ type AugmentedActionContext = {
 export interface Actions {
   [ActionType.updateRessourceMenu](
     { commit }: AugmentedActionContext,
-    payload: HeaderMenuStateUpdate
+    payload: OpenStateUpdate
   ): Promise<void>,
   [ActionType.updateRessourceTable](
     { commit }: AugmentedActionContext,
@@ -26,7 +26,7 @@ export interface Actions {
 }
 
 const actions: ActionTree<ColumboState, State> = {
-  [ActionType.updateRessourceMenu]({ commit }, update: HeaderMenuStateUpdate) {
+  [ActionType.updateRessourceMenu]({ commit }, update: OpenStateUpdate) {
     commit(MutationType.updateRessourceMenu, update);
   },
   [ActionType.updateRessourceTable]({ commit }, update: RessourceTableUpdate) {

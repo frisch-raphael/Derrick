@@ -1,21 +1,24 @@
 import faker from 'faker';
 import { IEngagement } from 'src/dtos/engagement';
-import { getRandomInt } from 'src/utils';
-import { makeFakeCompany } from './company';
+import { makeFakeCompany } from 'src/factories/mock/company';
+import { EngagementState } from 'src/enums/enums';
+import { getRandomInt } from 'src/factories/utils';
+import { DateTime } from 'luxon';
 
-const languages = ['french', 'english'];
+const languages = ['French', 'English'];
 const tests = ['Internal pentest', 'Phishing campain', 'Applicat web Contoso'];
+const assess = ['Internal', 'External'];
 
 export const makeFakeEngagement = (): IEngagement => {
     // const date = Math.random() * 365; 
     return {
         id: getRandomInt(10000),
         title: tests[getRandomInt(tests.length)],
-        assessment_type: tests[getRandomInt(tests.length)],
-        start_date: faker.date.past(),
-        end_date: faker.date.past(),
-        scoring: getRandomInt(2),
-        state: getRandomInt(2),
+        assessment_type: assess[getRandomInt(assess.length)],
+        start_date: DateTime.fromJSDate(faker.date.past()).toFormat('yyyy/mm/dd'),
+        end_date: DateTime.fromJSDate(faker.date.past()).toFormat('yyyy/mm/dd'),
+        scoring: getRandomInt(1),
+        state: EngagementState.Ongoing,
         language: languages[getRandomInt(languages.length)],
         company: makeFakeCompany()
     };

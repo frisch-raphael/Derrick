@@ -1,7 +1,7 @@
 import { describe, expect, it, jest } from '@jest/globals';
 import { installQuasarPlugin } from '@quasar/quasar-app-extension-testing-unit-jest';
 import EngagementTable from 'src/pages/EngagementTable';
-import { makeFakeEngagement, makeFakeEngagements } from 'src/factories/mock/engagement';
+import { makeFakeEngagements } from 'src/factories/mock/engagement';
 import { IEngagement } from 'src/dtos/engagement';
 import request from 'src/axios';
 import { mountSuspense } from '../../utils';

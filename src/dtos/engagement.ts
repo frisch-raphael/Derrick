@@ -6,8 +6,8 @@ export interface IEngagement {
     id: number,
     title: string,
     assessment_type: string,
-    start_date: Date,
-    end_date: Date,
+    start_date: string,
+    end_date: string,
     scoring: Scoring,
     language: string
     state: EngagementState
@@ -19,11 +19,11 @@ export class Engagement implements IEngagement {
     public id = 0;
     public title = ''
     public assessment_type = ''
-    public start_date = new Date()
-    public end_date = new Date()
+    public start_date = ''
+    public end_date = ''
     public scoring = 0
     public language = ''
-    public state = 0
+    public state = EngagementState.Ongoing
 
     constructor(params: Record<string, any>) {
         Object.assign(this, params);

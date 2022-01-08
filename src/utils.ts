@@ -1,6 +1,6 @@
 import { ApiRessource } from 'src/enums/enums';
-import { DataTest, RessourceName } from './enums/enums';
-import { engagementForm } from './forms/engagement';
+import { DataTest, RessourceName } from 'src/enums/enums';
+import { engagementForm } from 'src/forms/engagement';
 import { RessourceFormType } from 'src/forms/types';
 
 export const prettyVariable = (variable: string) => {
@@ -15,10 +15,6 @@ export const capitalizeFirstLetter = (string: string) => {
 export const FullDataTest = (dataTest: DataTest) => {
     return `[data-test='${dataTest}']`;
 };
-
-export function getRandomInt(max: number) {
-    return Math.floor(Math.random() * max);
-}
 
 export const ressourceNameToApi: { [key in RessourceName]: ApiRessource } = {
     engagement: ApiRessource.Engagement,

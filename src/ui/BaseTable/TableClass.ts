@@ -56,7 +56,9 @@ export class Table {
                 name: 'remove'
             },
             {
-                function: (id: number, payload: Record<string, any>) => this.editRessource(id, payload),
+                function: (id: number, ressource: Record<string, any> & { id: number }) => this.store.commit(
+                    MutationType.updateCreateEditRessourceState,
+                    { isOpen: true, ressource: this.ressourceName, mode: 'edit', ressourceToEdit: ressource }),
                 isRessourcePayloadNeed: true,
                 icon: 'mdi-pencil',
                 color: 'green',
@@ -69,7 +71,9 @@ export class Table {
     private getDefaultHeaderActions(): HeaderAction[] {
         return [
             {
-                function: () => this.store.commit(MutationType.updateCreateRessourceDialog, { isOpen: true, ressource: this.ressourceName }),
+                function: () => this.store.commit(
+                    MutationType.updateCreateEditRessourceState,
+                    { isOpen: true, ressource: this.ressourceName, mode: 'create', ressourceToEdit: { id: 0 } }),
                 params: 'none',
                 icon: 'mdi-plus',
                 datatest: 'add',

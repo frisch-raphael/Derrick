@@ -19,9 +19,7 @@ const launchAction = (action: CardAction, row: Record<string, any>) => {
   action.isRessourcePayloadNeed && action.function(row.id, row);
 };
 const getFilteredcols = (cols: LooseDictionary) =>
-  cols.filter(
-    (col: { name: string; label: string; value: any }) => col.name !== 'desc'
-  );
+  cols.filter((col: { name: string; label: string; value: any }) => col.name !== 'title');
 </script>
 
 <template>
@@ -29,16 +27,13 @@ const getFilteredcols = (cols: LooseDictionary) =>
     class="q-pa-xs col-xs-12 col-sm-6 col-md-4 col-lg-3 grid-style-transition"
     :style="tableItem?.selected ? 'transform: scale(0.95);' : ''"
   >
-    <q-card
-      :class="tableItem?.selected ? 'bg-grey-2' : ''"
-      :data-cy="DataTest.RessourceTableCard"
-    >
+    <q-card :class="tableItem?.selected ? 'bg-grey-2' : ''" :data-cy="DataTest.RessourceTableCard">
       <q-card-section>
         <q-checkbox
           v-model="tableItem.selected"
           :data-cy="DataTest.RessourceTableCardCheckbox"
           dense
-          :label="tableItem?.row.name"
+          :label="tableItem?.row.title"
         />
         <q-space></q-space>
       </q-card-section>

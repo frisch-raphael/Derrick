@@ -6,7 +6,8 @@ type EngagementColumn = { name: keyof IEngagement } & Column<IEngagement>
 export const engagementColumns: EngagementColumn[] = [
     {
         name: 'title', field: 'title', label: 'Title', required: true
-    }, {
+    },
+    {
         name: 'assessment_type', field: 'assessment_type', label: 'Assessment Type', required: true
     }, {
         name: 'start_date', field: 'start_date', label: 'Start date'

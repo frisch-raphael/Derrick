@@ -3,7 +3,7 @@ import { ref, Ref } from 'vue';
 import SearchInput from 'src/ui/SearchInput.vue';
 import BaseTableCard from './BaseTableCard/BaseTableCard.vue';
 import BaseTableHeaderMenu from 'src/ui/BaseTable/BaseTableHeaderMenu/BaseTableHeaderMenu.vue';
-import CreateRessourceDialog from 'src/ui/BaseTable/CreateRessourceDialog.vue';
+import CreateEditRessourceDialog from 'src/ui/BaseTable/CreateEditRessourceDialog.vue';
 import { Table } from 'src/ui/BaseTable/TableClass';
 import { IRestClient } from 'src/classes/api/engagement';
 import { Columns, CardAction, HeaderAction, Row } from 'src/types/types';
@@ -37,10 +37,12 @@ const selected: Ref<Row[]> = ref([]);
 const allCardActions = props.cardActions.concat(defaultCardActions);
 const allHeaderActions = props.headerActions.concat(defaultHeaderActions);
 
+const updateFilter = (new_filter: string) => {
+  filter.value = new_filter;
+};
+
 const selectAllClicked = (checked: boolean) => {
-  selected.value = checked
-    ? store.getters.baseTableRows(RessourceName.Engagement)
-    : [];
+  selected.value = checked ? store.getters.baseTableRows(RessourceName.Engagement) : [];
 };
 </script>
 
@@ -52,13 +54,13 @@ const selectAllClicked = (checked: boolean) => {
       :columns="columns"
       row-key="id"
       selection="multiple"
-      :pagination="{ rowsNumber: 0 }"
+      :pagination="{ rowsPerPage: 0 }"
       :filter="filter"
       :grid="grid"
       hide-bottom
     >
       <template #top-right>
-        <search-input></search-input>
+        <search-input @update:modelValue="updateFilter"></search-input>
       </template>
 
       <template #top-left>
@@ -71,17 +73,11 @@ const selectAllClicked = (checked: boolean) => {
       </template>
 
       <template v-if="grid" #item="slotProps">
-        <base-table-card
-          :actions="allCardActions"
-          :table-item="slotProps"
-        ></base-table-card>
+        <base-table-card :actions="allCardActions" :table-item="slotProps"></base-table-card>
       </template>
     </q-table>
 
-    <q-markup-table
-      v-if="!store.getters.baseTableRows(ressourceName).length"
-      data-cy="no-data"
-    >
+    <q-markup-table v-if="!store.getters.baseTableRows(ressourceName).length" data-cy="no-data">
       <q-banner>
         <template #avatar>
           <q-icon name="mdi-emoticon-sad-outline" />
@@ -90,8 +86,6 @@ const selectAllClicked = (checked: boolean) => {
       </q-banner>
     </q-markup-table>
 
-    <create-ressource-dialog
-      :ressource-name="props.ressourceName"
-    ></create-ressource-dialog>
+    <create-edit-ressource-dialog :ressource-name="props.ressourceName"></create-edit-ressource-dialog>
   </div>
 </template>

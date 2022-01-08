@@ -7,36 +7,14 @@ import { storeKey } from 'src/store';
 import store from 'src/store/index';
 import { MutationType } from 'src/store/columbo/mutations-types';
 import { ApiRessource } from 'src/enums/enums';
+import { makeFakeEngagements } from 'src/factories/mock/engagement';
+import { engagementColumns } from 'src/pages/columns';
 // const mockedRestClient = mocked(RestClient, true)
 // Specify here Quasar config you'll need to test your component
 
-const columns = [
-    {
-        name: 'name',
-        required: true,
-        label: 'Dessert (100g serving)',
-        align: 'left',
-        field: 'name',
-        sortable: true
-    },
-    { name: 'calories', align: 'center', label: 'Calories', field: 'calories', sortable: true },
-    { name: 'fat', label: 'Fat (g)', field: 'fat' }
-];
+const columns = engagementColumns;
 
-const rows = [
-    {
-        name: 'Frozen Yogurt',
-        calories: 159,
-        fat: 6.0,
-        id: 1
-    },
-    {
-        name: 'Ice cream sandwich',
-        calories: 237,
-        fat: 9.0,
-        id: 2
-    }
-];
+const rows = makeFakeEngagements(5);
 
 describe('The BaseTable', () => {
 
@@ -54,6 +32,17 @@ describe('The BaseTable', () => {
                     restClient: new RestClient(ApiRessource.Engagement)
                 }
             });
+    });
+
+    it('can edit a ressource', () => {
+        cy.dataCy(DataTest.RessourceTableCardUpdateBtn).first().then(() => {
+
+        });
+    });
+
+    it('can filter cards', () => {
+        cy.dataCy(DataTest.RessourceTableSearchInput).click().type('dsfdsfdsfdsfsfezfzef');
+        cy.dataCy(DataTest.RessourceTableCard).should('not.exist');
     });
 
     it('has different style for selected card', () => {

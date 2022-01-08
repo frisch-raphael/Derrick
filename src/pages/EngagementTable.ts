@@ -28,7 +28,7 @@ export default defineComponent({
         engagements.value = response.data;
 
         const engagementsRowsFromBackend = engagements.value.map((e, i) => ({
-            name: `Engagement ${i + 1}`,
+            // name: `Engagement ${i + 1}`,
             ...e
         }));
 

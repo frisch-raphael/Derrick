@@ -1,22 +1,26 @@
 import { MutationTree } from 'vuex';
 import { ColumboState } from './state';
 import { MutationType } from 'src/store/columbo/mutations-types';
-import { HeaderMenuStateUpdate as isOpenStateUpdate } from 'src/store/columbo/types';
-import { RessourceTableUpdate, RessourceTableAdd, RessourceTableDelete } from './types';
+import { OpenStateUpdate } from 'src/store/columbo/types';
+import { RessourceTableUpdate, RessourceTableAdd, RessourceTableDelete, CreateEditRessourceStateUpdate } from './types';
 
 export type Mutations<S = ColumboState> = {
-  [MutationType.updateRessourceMenu](state: S, update: isOpenStateUpdate): void,
-  [MutationType.updateCreateRessourceDialog](state: S, update: isOpenStateUpdate): void,
+  [MutationType.updateRessourceMenu](state: S, update: OpenStateUpdate): void,
+  [MutationType.updateCreateEditRessourceState](state: S, update: CreateEditRessourceStateUpdate): void,
   [MutationType.updateRessourceTable](state: S, update: RessourceTableUpdate): void,
   [MutationType.destroyRessourceTable](state: S, destroy: RessourceTableDelete): void,
   [MutationType.addOneRessourceTable](state: S, add: RessourceTableAdd): void,
 }
 
 const mutation: MutationTree<ColumboState> & Mutations = {
-  [MutationType.updateCreateRessourceDialog](state: ColumboState, update: isOpenStateUpdate) {
-    state.isCreateDialogOpenFor[update.ressource] = update.isOpen;
+  [MutationType.updateCreateEditRessourceState](state: ColumboState, update: CreateEditRessourceStateUpdate) {
+    state.createEditRessourceStatus[update.ressource] = {
+      isOpen: update.isOpen,
+      mode: update.mode,
+      ressourceToEdit: update.ressourceToEdit
+    };
   },
-  [MutationType.updateRessourceMenu](state: ColumboState, update: isOpenStateUpdate) {
+  [MutationType.updateRessourceMenu](state: ColumboState, update: OpenStateUpdate) {
     state.isHeaderOpenFor[update.ressource] = update.isOpen;
   },
   [MutationType.updateRessourceTable](state: ColumboState, update: RessourceTableUpdate) {

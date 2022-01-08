@@ -1,11 +1,13 @@
 <script setup lang="ts">
-import { RessourceFormGeneric } from '../forms/types';
-import { prettyVariable } from '../utils';
+import { RessourceFormGeneric } from 'src/forms/types';
+import { prettyVariable } from 'src/utils';
 import { DataTest } from 'src/enums/enums';
 import { toRefs } from 'vue';
+import { GenericRessource } from 'src/types/types';
 
 const props = defineProps<{
   ressourceFormConfig: RessourceFormGeneric;
+  ressource?: GenericRessource;
 }>();
 const ressourceTosubmit: Record<string, any> = toRefs({});
 const emit = defineEmits(['ressourceFormUpdate']);
@@ -21,6 +23,14 @@ const updateForm = (param: string, value: string) => {
   ressourceTosubmit[param] = value;
   emit('ressourceFormUpdate', ressourceTosubmit);
 };
+const value = (param: string, defaultValue?: string) => {
+  // if there's a ressource to edit we send it as the value
+  // else the default value (i.e param = state => 'Ongoing')
+  // else nothing
+  if (props.ressource) {
+    return props.ressource[param] as string;
+  } else return defaultValue;
+};
 </script>
 
 <template>
@@ -33,7 +43,7 @@ const updateForm = (param: string, value: string) => {
       :label="prettyVariable(param)"
       :icon="config.icon"
       :data-test="`form-${param}`"
-      :default="config.default"
+      :value="value(param, config.default)"
       @update:modelValue="updateForm(param, $event)"
     >
     </component>

@@ -140,11 +140,13 @@ type FunctionlessHeaderAction = {
     datatest: string,
 }
 
+export type GenericRessource = Record<string, any> & { id: number }
+
 type FunctionCardAction = {
     function: (id: number) => void,
     isRessourcePayloadNeed: false
 } | {
-    function: (id: number, payload: Record<string, any>) => void,
+    function: (id: number, ressource: GenericRessource) => void,
     isRessourcePayloadNeed: true
 }
 
