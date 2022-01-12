@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, toRef, reactive } from 'vue';
+import { reactive } from 'vue';
 
 const props = defineProps<{
   icon: string;

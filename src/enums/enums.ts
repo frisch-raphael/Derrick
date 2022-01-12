@@ -24,7 +24,10 @@ export enum ApiRessource {
 
 
 export enum DataTest {
+    DrawerReportBtn = 'drawer-report-button',
+    DrawerAdminBtn = 'drawer-admin-button',
     DialogBase = 'base-dialog',
+    DialogBaseCard = 'base-dialog-card',
     DialogBaseClose = 'close-dialog',
     FormSelect = 'select-form',
     FormGenericInput = 'generic-input-form',
@@ -32,12 +35,15 @@ export enum DataTest {
     FormDateDialog = 'date-form-dialog',
     FormDateOpenBtn = 'date-form-open-btn',
     RessourceForm = 'ressource-form',
+    RessourceFormCreateEditBtn = 'engagement-create-edit-btn',
     RessourceTableSearchInput = 'ressource-table-search-input',
     RessourceTableSelectAll = 'ressource-table-select-all',
     RessourceTableOpenHeaderMenuBtn = 'open-menu-btn',
     RessourceTableHeaderDeleteAll = 'ressource-table-header-delete-all',
-    RessourceTableCreateBtn = 'engagement-create-btn',
+    RessourceTableHeaderCreateNew = 'ressource-table-header-create-new',
+    RessourceTableLoading = 'base-table-loading',
     RessourceTableCard = 'base-table-card',
+    RessourceTableCardLoading = 'base-table-card-loading',
     RessourceTableCardDeleteBtn = 'table-card-action-remove',
     RessourceTableCardUpdateBtn = 'table-card-action-update',
     RessourceTableCardSaveBtn = 'table-card-action-save',

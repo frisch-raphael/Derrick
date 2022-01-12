@@ -10,7 +10,7 @@ installQuasarPlugin();
 
 const engagementMenuElementSelector = "[data-cy='Findings']";
 const adminMenuElementSelector = "[data-cy='Configuration']";
-const toAdminElementSelector = "[data-cy='to-admin']";
+const toAdminElementSelector = "[data-cy='drawer-admin-button']";
 const toEngagementsElementSelector = "[data-cy='Other engagements']";
 
 describe('TheDrawer', () => {
@@ -46,7 +46,7 @@ describe('TheDrawer', () => {
 
   it('can switch from administration to engagements', () => {
     const wrapper = mount(TheDrawer);
-    const engagementButtonSwitcher = wrapper.findComponent("[data-cy='to-engagement']");
+    const engagementButtonSwitcher = wrapper.findComponent("[data-cy='drawer-report-button']");
     // expect(wrapper.findComponent(QItem).exists()).toBe(true);
     expect(engagementButtonSwitcher.exists()).toBe(true);
     wrapper.vm.switchDrawerContext('engagement');

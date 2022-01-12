@@ -4,7 +4,9 @@ import { engagementForm } from 'src/forms/engagement';
 import { DataTest } from '../enums/enums';
 import { FullDataTest, prettyVariable } from '../utils';
 import { makeFakeEngagement } from '../factories/mock/engagement';
-import { GenericRessource } from '../types/types';
+import { installQuasarPlugin } from '@quasar/quasar-app-extension-testing-e2e-cypress';
+import { Dialog, Notify } from 'quasar';
+installQuasarPlugin({ plugins: { Dialog, Notify } });
 
 
 describe('The RessourceForm', () => {
@@ -20,6 +22,19 @@ describe('The RessourceForm', () => {
         });
     });
 
+
+
+
+    it('display error if title not filled', () => {
+        cy.get(FullDataTest(DataTest.EngagementFormTitle)).clear();
+        cy.dataCy(DataTest.RessourceFormCreateEditBtn).click().then(() => {
+            cy.dataCy(DataTest.RessourceForm).should('contain', 'Title is required');
+        });
+        cy.get(FullDataTest(DataTest.EngagementFormTitle)).type('azddfs').then(() => {
+            cy.dataCy(DataTest.RessourceForm).should('not.contain', 'Title is required');
+
+        });
+    });
 
     it('has correct components for params : date, input, select...', () => {
         cy.get(FullDataTest(DataTest.EngagementFormStartDate)).should('exist');
@@ -42,4 +57,8 @@ describe('The RessourceForm', () => {
         cy.get("[data-test='form-start_date']").should('have.value', fakeEngagement.start_date);
         cy.get("[data-test='form-end_date']").should('have.value', fakeEngagement.end_date);
     });
+
+
+
+
 });

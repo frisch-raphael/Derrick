@@ -6,7 +6,8 @@
       <q-item v-if="isUserAdmin()">
         <q-btn-group rounded class="absolute-center q-ma-xs">
           <q-btn
-            data-cy="to-engagement"
+            :color="storedcontext === 'engagement' ? 'primary' : undefined"
+            :data-cy="DataTest.DrawerReportBtn"
             rounded
             icon="mdi-file-outline"
             @click="switchDrawerContext('engagement')"
@@ -14,8 +15,9 @@
             Report
           </q-btn>
           <q-btn
+            :data-cy="DataTest.DrawerAdminBtn"
+            :color="storedcontext === 'admin' ? 'primary' : undefined"
             rounded
-            data-cy="to-admin"
             icon="mdi-shield-crown-outline"
             @click="switchDrawerContext('admin')"
             >Admin</q-btn
@@ -32,7 +34,7 @@
           :active="menuItem.name === 'Outbox'"
         >
           <q-item-section v-if="menuItem.icon" avatar>
-            <q-icon :name="menuItem.icon" />
+            <q-icon color="secondary" :name="menuItem.icon" />
           </q-item-section>
           <q-item-section
             v-if="menuItem.name"

@@ -1,3 +1,4 @@
+import { DataTest } from 'src/enums/enums';
 import { defineComponent, ref, Ref } from 'vue';
 
 type MenuElement = { name?: string, icon?: string, isSeparator?: boolean, isTitle?: boolean, goto?: string }
@@ -51,6 +52,7 @@ export default defineComponent({
             { name: undefined, icon: undefined, isSeparator: true },
             { name: 'Other engagements', icon: 'mdi-arrow-right', goto: 'engagements' },
         ];
+        const storedcontext: Ref<'admin' | 'engagement'> = ref('engagement');
 
         const getDrawerTitleClasses = (isTitle?: boolean) => {
             return isTitle ? 'text-weight-bold' : '';
@@ -63,10 +65,14 @@ export default defineComponent({
         const currentMenu: Ref<MenuElement[]> = ref(engagementMenu);
         // const currentMenu =
         // props.context == 'administration' ? adminMenu : engagementMenu;
-        const switchDrawerContext = (context: 'admin' | 'engagement') =>
+        const switchDrawerContext = (context: 'admin' | 'engagement') => {
             currentMenu.value = context == 'admin' ? adminMenu : engagementMenu;
+            storedcontext.value = context;
+        };
 
         return {
+            DataTest,
+            storedcontext,
             currentMenu,
             getDrawerTitleClasses,
             isUserAdmin,

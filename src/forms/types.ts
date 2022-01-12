@@ -7,6 +7,7 @@ type RessourceFormParams = {
     attrs?: Record<string, any>,
     icon?: string,
     default?: string,
+    rules?: any
 }
 
 export type RessourceFormType<T> = {

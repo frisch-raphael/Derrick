@@ -8,16 +8,20 @@ import { EngagementState } from 'src/enums/enums';
 
 
 export const engagementForm: RessourceFormType<IEngagement> = {
-    title: { component: BaseInputForm, icon: 'mdi-format-title' },
+    title: {
+        component: BaseInputForm, icon: 'mdi-format-title', rules: [(val: string) => !!val || 'Title is required']
+    },
     assessment_type: {
         component: BaseSelectForm,
         attrs: { options: ['Internal', 'External'] },
-        icon: 'mdi-cloud-outline'
+        icon: 'mdi-cloud-outline',
+        rules: [(val: string) => !!val || 'Assessment type is required']
     },
     language: {
         component: BaseSelectForm,
         attrs: { options: ['French', 'English'] },
-        icon: 'mdi-translate'
+        icon: 'mdi-translate',
+        rules: [(val: string) => !!val || 'Language is required']
     },
     state: {
         component: BaseSelectForm,

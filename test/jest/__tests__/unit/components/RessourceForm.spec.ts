@@ -18,10 +18,12 @@ describe('A ressource form', () => {
         ressourceFormConfig: engagementForm
       },
     });
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
     wrapper.findComponent(BaseInputForm).vm.$emit('update:modelValue', 'test');
     expect(wrapper.emitted('ressourceFormUpdate')).toBeTruthy();
   });
 
-  
-  
+
+
 });

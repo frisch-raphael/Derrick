@@ -1,5 +1,5 @@
 import { CardAction } from 'src/types/types';
-import { IRestClient } from 'src/classes/api/engagement';
+import { IRestClient } from 'src/classes/api/restClient';
 import { HeaderAction } from 'src/types/types';
 import { MutationType } from 'src/store/columbo/mutations-types';
 import { RessourceName } from 'src/enums/enums';
@@ -13,20 +13,18 @@ export class Table {
 
     constructor(
         props: { restclient?: IRestClient, ressourceName: RessourceName } & Record<string, any>,
-        private emit: (event: 'add', ...args: any[]) => void,
         private store: Store) {
         const { restClient } = props;
         if (!restClient) throw 'restClient is undefined';
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         this.restClient = restClient;
         this.ressourceName = props.ressourceName;
-        this.emit = emit;
     }
 
     private async deleteRowsInTableAndBackend(ids: number[] | number) {
         try {
             if (typeof ids === 'number') ids = [ids];
-            this.store.commit(MutationType.destroyRessourceTable, { ressource: RessourceName.Engagement, ids: ids });
+            this.store.commit(MutationType.destroyRessourceTableRows, { ressource: RessourceName.Engagement, ids: ids });
             await this.restClient.delete(ids);
         } catch (err) {
             const error = err as AxiosError;
@@ -51,7 +49,7 @@ export class Table {
                 function: (id: number) => this.deleteRowsInTableAndBackend(id),
                 isRessourcePayloadNeed: false,
                 icon: 'mdi-delete',
-                color: 'red',
+                color: 'negative',
                 tooltip: 'Remove',
                 name: 'remove'
             },
@@ -61,7 +59,7 @@ export class Table {
                     { isOpen: true, ressource: this.ressourceName, mode: 'edit', ressourceToEdit: ressource }),
                 isRessourcePayloadNeed: true,
                 icon: 'mdi-pencil',
-                color: 'green',
+                color: 'positive',
                 tooltip: 'Edit',
                 name: 'update'
             }
@@ -76,7 +74,7 @@ export class Table {
                     { isOpen: true, ressource: this.ressourceName, mode: 'create', ressourceToEdit: { id: 0 } }),
                 params: 'none',
                 icon: 'mdi-plus',
-                datatest: 'add',
+                datatest: DataTest.RessourceTableHeaderCreateNew,
                 name: 'Create new ' + this.ressourceName
             },
             {

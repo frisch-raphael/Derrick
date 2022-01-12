@@ -6,8 +6,12 @@ import { storeKey } from 'src/store';
 import store from 'src/store/index';
 import { MutationType } from 'src/store/columbo/mutations-types';
 import { makeFakeEngagement } from 'src/factories/mock/engagement';
+import { installQuasarPlugin } from '@quasar/quasar-app-extension-testing-e2e-cypress';
+import { Dialog, Notify } from 'quasar';
+import { FullDataTest } from 'src/utils';
 // const mockedRestClient = mocked(RestClient, true)
 // Specify here Quasar config you'll need to test your component
+installQuasarPlugin({ plugins: { Dialog, Notify } });
 
 
 const fakeEngagement = makeFakeEngagement();
@@ -46,5 +50,11 @@ describe('a CreateRessourceDialog', () => {
 
     });
 
+    it('stays if error', () => {
+        cy.get(FullDataTest(DataTest.EngagementFormTitle)).clear();
+        cy.dataCy(DataTest.RessourceFormCreateEditBtn).click().then(() => {
 
+            cy.dataCy(DataTest.DialogBaseCard).should('exist');
+        });
+    });
 });

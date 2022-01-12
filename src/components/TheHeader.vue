@@ -1,15 +1,9 @@
 <template>
   <q-header elevated>
-    <q-toolbar shadow class="bg-white text-black">
+    <q-toolbar shadow class="bg-dark">
       <q-toolbar-title>Columbo</q-toolbar-title>
 
       <q-space />
-
-      <q-btn text>Engagements list</q-btn>
-
-      <q-btn class="q-ml-xs" data-cy="header-admin-button" text
-        >Administration</q-btn
-      >
 
       <q-btn class="q-mr-xs q-ml-xs" color="primary" plain>
         <q-icon left name="mdi-account-arrow-left" />

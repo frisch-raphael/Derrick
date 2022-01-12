@@ -20,7 +20,6 @@ const pluginConfig: Cypress.PluginConfig = async (on, config) => {
   if (config.testingType === 'component') {
     await injectDevServer(on, config);
   }
-
   return config;
 };
 

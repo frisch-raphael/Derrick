@@ -3,6 +3,7 @@
 import { defineComponent, PropType } from 'vue';
 import { TableItem, CardAction } from 'src/types/types';
 import { LooseDictionary } from 'src/types/types';
+import { GenericRessource } from '../../../types/types';
 
 export default defineComponent({
     name: 'BaseTableCard',
@@ -18,7 +19,7 @@ export default defineComponent({
         }
     },
     data() {
-        const launchAction = (action: CardAction, row: Record<string, any>) => {
+        const launchAction = (action: CardAction, row: GenericRessource) => {
             action.isRessourcePayloadNeed || action.function(row.id);
             action.isRessourcePayloadNeed && action.function(row.id, row);
 

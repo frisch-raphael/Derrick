@@ -5,10 +5,11 @@ import BaseTableCard from './BaseTableCard/BaseTableCard.vue';
 import BaseTableHeaderMenu from 'src/ui/BaseTable/BaseTableHeaderMenu/BaseTableHeaderMenu.vue';
 import CreateEditRessourceDialog from 'src/ui/BaseTable/CreateEditRessourceDialog.vue';
 import { Table } from 'src/ui/BaseTable/TableClass';
-import { IRestClient } from 'src/classes/api/engagement';
-import { Columns, CardAction, HeaderAction, Row } from 'src/types/types';
-import { RessourceName } from 'src/enums/enums';
+import { IRestClient } from 'src/classes/api/restClient';
+import { Columns, CardAction, HeaderAction, Row, TableItem } from 'src/types/types';
+import { RessourceName, DataTest } from 'src/enums/enums';
 import { useStore } from 'src/store';
+import { LooseDictionary } from '../../types/types';
 
 const store = useStore();
 
@@ -27,10 +28,10 @@ const props = withDefaults(defineProps<Props>(), {
   grid: true,
 });
 
-const emit = defineEmits(['add']);
 
-const table = new Table(props, emit, store);
+const table = new Table(props, store);
 const { defaultCardActions, defaultHeaderActions } = table.getDefaultActions();
+const isLoading = ref(false);
 
 const filter = ref(''); //TODO link to SearchInput
 const selected: Ref<Row[]> = ref([]);
@@ -42,15 +43,24 @@ const updateFilter = (new_filter: string) => {
 };
 
 const selectAllClicked = (checked: boolean) => {
-  selected.value = checked ? store.getters.baseTableRows(RessourceName.Engagement) : [];
+  selected.value = checked ? store.getters.RessourceTableRows(RessourceName.Engagement) : [];
+};
+
+const typeSlotProps = (slotProps: LooseDictionary) => {
+  return slotProps as TableItem;
 };
 </script>
 
 <template>
   <div class="q-pa-md">
+    <q-linear-progress
+      :data-cy="DataTest.RessourceTableLoading"
+      color="primary"
+      :indeterminate="isLoading"
+    ></q-linear-progress>
     <q-table
       v-model:selected="selected"
-      :rows="store.getters.baseTableRows(ressourceName)"
+      :rows="store.getters.RessourceTableRows(ressourceName)"
       :columns="columns"
       row-key="id"
       selection="multiple"
@@ -73,19 +83,26 @@ const selectAllClicked = (checked: boolean) => {
       </template>
 
       <template v-if="grid" #item="slotProps">
-        <base-table-card :actions="allCardActions" :table-item="slotProps"></base-table-card>
+        <base-table-card
+          :ressource-name="ressourceName"
+          :actions="allCardActions"
+          :table-item="typeSlotProps(slotProps)"
+        ></base-table-card>
       </template>
     </q-table>
 
-    <q-markup-table v-if="!store.getters.baseTableRows(ressourceName).length" data-cy="no-data">
+    <q-markup-table v-if="!store.getters.RessourceTableRows(ressourceName).length" data-cy="no-data">
       <q-banner>
         <template #avatar>
-          <q-icon name="mdi-emoticon-sad-outline" />
+          <q-icon color="primary" name="mdi-emoticon-sad-outline" />
         </template>
         No {{ ressourceName }} found ! Create one from the menu.
       </q-banner>
     </q-markup-table>
 
-    <create-edit-ressource-dialog :ressource-name="props.ressourceName"></create-edit-ressource-dialog>
+    <create-edit-ressource-dialog
+      :ressource-name="props.ressourceName"
+      @loading-changed="isLoading = !isLoading"
+    ></create-edit-ressource-dialog>
   </div>
 </template>

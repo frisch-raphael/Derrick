@@ -9,12 +9,18 @@ const props = defineProps<{
   ressourceFormConfig: RessourceFormGeneric;
   ressource?: GenericRessource;
 }>();
-const ressourceTosubmit: Record<string, any> = toRefs({});
-const emit = defineEmits(['ressourceFormUpdate']);
+let ressourceTosubmit: Record<string, any> = toRefs({});
+const emit = defineEmits(['ressourceFormUpdate', 'submit', 'submitClick']);
 
 const initDefaultValue = () => {
+  if (props.ressource) {
+    ressourceTosubmit = { ...props.ressource };
+    emit('ressourceFormUpdate', ressourceTosubmit);
+    return;
+  }
   for (const param in props.ressourceFormConfig) {
     ressourceTosubmit[param] = props.ressourceFormConfig[param].default;
+    emit('ressourceFormUpdate', ressourceTosubmit);
   }
 };
 initDefaultValue();
@@ -22,6 +28,9 @@ initDefaultValue();
 const updateForm = (param: string, value: string) => {
   ressourceTosubmit[param] = value;
   emit('ressourceFormUpdate', ressourceTosubmit);
+};
+const onSubmit = () => {
+  emit('submit');
 };
 const value = (param: string, defaultValue?: string) => {
   // if there's a ressource to edit we send it as the value
@@ -35,17 +44,29 @@ const value = (param: string, defaultValue?: string) => {
 
 <template>
   <div :data-cy="DataTest.RessourceForm">
-    <component
-      :is="config.component"
-      v-for="(config, param) in ressourceFormConfig"
-      :key="param"
-      v-bind="config.attrs"
-      :label="prettyVariable(param)"
-      :icon="config.icon"
-      :data-test="`form-${param}`"
-      :value="value(param, config.default)"
-      @update:modelValue="updateForm(param, $event)"
-    >
-    </component>
+    <q-form ref="ressourceForm" @submit="onSubmit">
+      <component
+        :is="config.component"
+        v-for="(config, param) in ressourceFormConfig"
+        :key="param"
+        v-bind="config.attrs"
+        :label="prettyVariable(param)"
+        :icon="config.icon"
+        :data-test="`form-${param}`"
+        :value="value(param, config.default)"
+        :rules="config.rules"
+        @update:modelValue="updateForm(param, $event)"
+      >
+      </component>
+      <div align="center" class="q-mt-md">
+        <q-btn
+          label="Submit"
+          :data-cy="DataTest.RessourceFormCreateEditBtn"
+          type="submit"
+          color="primary"
+          @click="emit('submitClick')"
+        />
+      </div>
+    </q-form>
   </div>
 </template>

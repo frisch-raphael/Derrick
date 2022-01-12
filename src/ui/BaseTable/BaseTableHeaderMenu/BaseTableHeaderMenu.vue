@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, Ref } from 'vue';
+import { computed, ref } from 'vue';
 import { useStore } from 'src/store';
 import { HeaderAction, Row } from 'src/types/types';
 import { MutationType } from 'src/store/columbo/mutations-types';
@@ -27,12 +27,10 @@ const menuState = computed({
 
 const launchAction = (headerAction: HeaderAction) => {
   if (headerAction.params === 'none') headerAction.function();
-  else if (headerAction.params === 'ids')
-    headerAction.function(props.selected.map((r) => r.id));
+  else if (headerAction.params === 'ids') headerAction.function(props.selected.map((r) => r.id));
 };
 const isDisabled = (headerAction: HeaderAction): boolean => {
-  if (headerAction.params === 'ids')
-    return !props.selected.map((r) => r.id).length;
+  if (headerAction.params === 'ids') return !props.selected.map((r) => r.id).length;
   else return false;
 };
 const selectAll = ref(false);

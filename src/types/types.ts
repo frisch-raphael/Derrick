@@ -83,7 +83,7 @@ export type TableItem = {
     /**
      * Row/Item object
      */
-    row: LooseDictionary;
+    row: GenericRessource;
     /**
      * Row/Item's index (0 based) in the filtered and sorted table
      */

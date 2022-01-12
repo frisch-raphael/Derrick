@@ -3,13 +3,13 @@ import { mocked } from 'ts-jest/utils';
 import { installQuasarPlugin } from '@quasar/quasar-app-extension-testing-unit-jest';
 import { mount } from '@vue/test-utils';
 import BaseTable from 'src/ui/BaseTable/BaseTable.vue';
-import RestClient from 'src/classes/api/engagement';
+import RestClient from 'src/classes/api/restClient';
 import { ApiRessource, RessourceName } from 'src/enums/enums';
 import { storeKey } from 'src/store';
 import store from 'src/store/index';
 import { MutationType } from 'src/store/columbo/mutations-types';
 import { DataTest } from '../../../../../src/enums/enums';
-jest.mock('src/classes/api/engagement');
+jest.mock('src/classes/api/restClient');
 const mockedRestClient = <jest.Mock<RestClient>>RestClient;
 // const mockedRestClient = mocked(RestClient, true)
 // Specify here Quasar config you'll need to test your component
@@ -86,7 +86,7 @@ describe('a BaseTable', () => {
     await removeButton.trigger('click');
     // eslint-disable-next-line @typescript-eslint/unbound-method
     expect(restClient.delete).toHaveBeenCalled();
-    expect(store.getters.baseTableRows(RessourceName.Engagement).length).toBe(rowNumber - 1);
+    expect(store.getters.RessourceTableRows(RessourceName.Engagement).length).toBe(rowNumber - 1);
   });
 
 });

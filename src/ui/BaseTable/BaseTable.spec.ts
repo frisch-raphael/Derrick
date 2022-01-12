@@ -2,26 +2,39 @@ import { mount } from '@cypress/vue';
 import BaseTable from 'src/ui/BaseTable/BaseTable.vue';
 import { DataTest, RessourceName } from 'src/enums/enums';
 
-import RestClient from 'src/classes/api/engagement';
+import RestClient from 'src/classes/api/restClient';
 import { storeKey } from 'src/store';
 import store from 'src/store/index';
 import { MutationType } from 'src/store/columbo/mutations-types';
-import { ApiRessource } from 'src/enums/enums';
-import { makeFakeEngagements } from 'src/factories/mock/engagement';
+import { makeFakeEngagements, makeFakeEngagement } from 'src/factories/mock/engagement';
 import { engagementColumns } from 'src/pages/columns';
-// const mockedRestClient = mocked(RestClient, true)
-// Specify here Quasar config you'll need to test your component
+import { Dialog, Notify } from 'quasar';
+import { installQuasarPlugin } from '@quasar/quasar-app-extension-testing-e2e-cypress';
+import { FullDataTest } from '../../utils';
+import { initRessourceFormWithEngagement } from '../../../test/cypress/utils';
 
+installQuasarPlugin({ plugins: { Dialog, Notify } });
 const columns = engagementColumns;
 
-const rows = makeFakeEngagements(5);
-
+const fakeEngagementsInStore = makeFakeEngagements(5);
 describe('The BaseTable', () => {
 
     beforeEach(() => {
-        store.commit(MutationType.updateRessourceTable, { ressource: RessourceName.Engagement, rows: rows });
+        store.commit(MutationType.updateCreateEditRessourceState,
+            {
+                ressource: RessourceName.Engagement,
+                isOpen: false,
+                mode: 'create',
+                ressourceToEdit: { id: 0 }
+            });
+        store.commit(MutationType.updateRessourceTable,
+            {
+                ressource: RessourceName.Engagement,
+                rows: fakeEngagementsInStore
+            });
         mount(BaseTable,
             {
+
                 global: {
                     provide: { [(storeKey as any)]: store }
                 },
@@ -29,16 +42,108 @@ describe('The BaseTable', () => {
                     grid: true,
                     columns: columns,
                     ressourceName: RessourceName.Engagement,
-                    restClient: new RestClient(ApiRessource.Engagement)
+                    restClient: new RestClient(RessourceName.Engagement)
                 }
-            });
+            }).as('wrapper');
+        Notify.setDefaults({ timeout: 200 });
+
     });
 
-    it('can edit a ressource', () => {
-        cy.dataCy(DataTest.RessourceTableCardUpdateBtn).first().then(() => {
+    it('has load bars for edit, create', () => {
+        cy.intercept('POST', '/engagements', {}).as('createEngagement');
+        cy.intercept('PUT', '/engagements/*', { statusCode: 200 }).as('updateEngagement');
+
+        cy.dataCy(DataTest.RessourceTableCardUpdateBtn).first().click().then(() => {
+            cy.dataCy(DataTest.RessourceFormCreateEditBtn).click().then(() => {
+                cy.dataCy(DataTest.RessourceTableCardLoading).first().should('not.have.attr', 'aria-valuenow');
+                cy.dataCy(DataTest.RessourceTableLoading).should('have.attr', 'aria-valuenow');
+                cy.wait('@updateEngagement');
+                cy.dataCy(DataTest.RessourceTableCardLoading).first().should('have.attr', 'aria-valuenow');
+
+            });
+        });
+
+        cy.dataCy(DataTest.RessourceTableOpenHeaderMenuBtn).click().then(() => {
+            cy.dataCy(DataTest.RessourceTableHeaderCreateNew).click().then(() => {
+                initRessourceFormWithEngagement(makeFakeEngagement());
+                cy.dataCy(DataTest.RessourceFormCreateEditBtn).click().then(() => {
+
+                    cy.dataCy(DataTest.RessourceTableLoading).should('not.have.attr', 'aria-valuenow');
+                    cy.wait('@createEngagement');
+                    cy.dataCy(DataTest.RessourceTableLoading).should('have.attr', 'aria-valuenow');
+                });
+            });
+        });
+
+    });
+
+    it('send correct params to api', () => {
+        cy.intercept('PUT', '/engagements/*', {}).as(
+            'engagement'
+        );
+
+        cy.dataCy(DataTest.RessourceTableCardUpdateBtn).first().click().then(() => {
+            cy.dataCy(DataTest.RessourceFormCreateEditBtn).click().then(() => {
+                cy.wait('@engagement');
+                // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                const { company, ...fakeEngagement } = fakeEngagementsInStore[0];
+                for (const [key, value] of Object.entries(fakeEngagement)) {
+                    cy.get('@engagement').its(`request.body.${key}`).should('equal', value);
+                }
+            });
 
         });
     });
+
+    it('can edit a ressource', () => {
+        const editedEngagement = makeFakeEngagement();
+        editedEngagement.id = fakeEngagementsInStore[0].id;
+        cy.intercept('PUT', '/engagements/*', {
+            statusCode: 200,
+            body: editedEngagement
+        });
+        cy.dataCy(DataTest.RessourceTableCardUpdateBtn).first().click().then(() => {
+
+            cy.dataCy(DataTest.RessourceFormCreateEditBtn).click().then(() => {
+                cy.dataCy(DataTest.DialogBase).should('not.exist');
+                cy.get('.bg-positive.q-notification').should('exist');
+                // cy.dataCy(DataTest.RessourceTableCard).last().should('contain.text', `Engagement ${numberOfEngagementBefore + 1}`);
+                cy.dataCy(DataTest.RessourceTableCard).first().should('contain.text', editedEngagement.title);
+                cy.dataCy(DataTest.RessourceTableCard).first().should('contain.text', editedEngagement.end_date);
+                cy.dataCy(DataTest.RessourceTableCard).first().should('contain.text', editedEngagement.start_date);
+                cy.dataCy(DataTest.RessourceTableCard).first().should('contain.text', editedEngagement.assessment_type);
+                cy.dataCy(DataTest.RessourceTableCard).first().should('contain.text', editedEngagement.language);
+            });
+
+        });
+    });
+
+
+    it('error popup', () => {
+        Notify.create({});
+
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        cy.intercept('PUT', '/engagements/*', {
+            statusCode: 404,
+            body: {}
+        });
+        store.commit(MutationType.createEditOneRessourceTableRow, {
+            ressource: RessourceName.Engagement,
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+            row: makeFakeEngagement()
+        });
+
+        cy.dataCy(DataTest.RessourceTableCardUpdateBtn).last().click().then(() => {
+
+            cy.dataCy(DataTest.RessourceFormCreateEditBtn).click().then(() => {
+                // cy.dataCy(DataTest.DialogBase).should('not.exist');
+                cy.get('.bg-negative.q-notification').should('exist');
+                cy.get('.bg-negative.q-notification').should('contain.text', `could not edit ${RessourceName.Engagement}`);
+            });
+
+        });
+    });
+
 
     it('can filter cards', () => {
         cy.dataCy(DataTest.RessourceTableSearchInput).click().type('dsfdsfdsfdsfsfezfzef');
@@ -47,20 +152,14 @@ describe('The BaseTable', () => {
 
     it('has different style for selected card', () => {
 
-        cy.dataCy(DataTest.RessourceTableCard).first().then((baseTableCard) => {
-            const unclickedBaseTableCardClassesNumber = baseTableCard.attr('class')?.split(' ').length ?? 0;
-            cy.dataCy(DataTest.RessourceTableCardCheckbox).first().trigger('click').then(() => {
-                cy.dataCy(DataTest.RessourceTableCard).first().then((baseTableCard) => {
-                    const clickedBaseTableCardClassesNumber = baseTableCard.attr('class')?.split(' ').length ?? 0;
-
-                    expect(clickedBaseTableCardClassesNumber).equal(unclickedBaseTableCardClassesNumber + 1);
-                });
-            });
+        cy.dataCy(DataTest.RessourceTableCard).first().should('not.have.class', 'bg-primary');
+        cy.dataCy(DataTest.RessourceTableCardCheckbox).first().trigger('click').then(() => {
+            cy.dataCy(DataTest.RessourceTableCard).first().should('have.class', 'bg-primary');
         });
     });
 
     it('display the right number of row', () => {
-        cy.dataCy(DataTest.RessourceTableCard).should('have.lengthOf', rows.length);
+        cy.dataCy(DataTest.RessourceTableCard).should('have.lengthOf', fakeEngagementsInStore.length);
     });
 
     it('does not display "no data" warning when rows > 0', () => {

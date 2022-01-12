@@ -90,6 +90,7 @@ module.exports = configure(function (ctx) {
     // https://quasar.dev/quasar-cli/quasar-conf-js#Property%3A-framework
     framework: {
       config: {
+        dark: true, // or Boolean true/false
         notify: {
           /* look at QuasarConfOptions from the API card */
         },
