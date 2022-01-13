@@ -4,9 +4,8 @@ import SearchInput from 'src/ui/SearchInput.vue';
 import BaseTableCard from './BaseTableCard/BaseTableCard.vue';
 import BaseTableHeaderMenu from 'src/ui/BaseTable/BaseTableHeaderMenu/BaseTableHeaderMenu.vue';
 import CreateEditRessourceDialog from 'src/ui/BaseTable/CreateEditRessourceDialog.vue';
-import { Table } from 'src/ui/BaseTable/TableClass';
-import { IRestClient } from 'src/classes/api/restClient';
-import { Columns, CardAction, HeaderAction, Row, TableItem } from 'src/types/types';
+import { RessourceActions } from 'src/ui/BaseTable/ressourceActions';
+import { Columns, HeaderAction, Row, TableItem } from 'src/types/types';
 import { RessourceName, DataTest } from 'src/enums/enums';
 import { useStore } from 'src/store';
 import { LooseDictionary } from '../../types/types';
@@ -14,28 +13,23 @@ import { LooseDictionary } from '../../types/types';
 const store = useStore();
 
 interface Props {
-  restClient: IRestClient;
   ressourceName: RessourceName;
   grid: boolean;
   columns: Columns<any>;
-  cardActions: CardAction[];
-  headerActions: HeaderAction[];
+  headerActions?: HeaderAction[];
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  cardActions: () => [],
   headerActions: () => [],
   grid: true,
 });
 
-
-const table = new Table(props, store);
-const { defaultCardActions, defaultHeaderActions } = table.getDefaultActions();
+const ressourceActions = new RessourceActions(props.ressourceName, store);
+const { defaultHeaderActions } = ressourceActions.getDefaultActions();
 const isLoading = ref(false);
 
 const filter = ref(''); //TODO link to SearchInput
 const selected: Ref<Row[]> = ref([]);
-const allCardActions = props.cardActions.concat(defaultCardActions);
 const allHeaderActions = props.headerActions.concat(defaultHeaderActions);
 
 const updateFilter = (new_filter: string) => {
@@ -83,11 +77,11 @@ const typeSlotProps = (slotProps: LooseDictionary) => {
       </template>
 
       <template v-if="grid" #item="slotProps">
-        <base-table-card
-          :ressource-name="ressourceName"
-          :actions="allCardActions"
-          :table-item="typeSlotProps(slotProps)"
-        ></base-table-card>
+        <base-table-card :ressource-name="ressourceName" :table-item="typeSlotProps(slotProps)">
+          <template #bottom-actions="{ row }">
+            <slot name="card-bottom-actions" :row="row"></slot>
+          </template>
+        </base-table-card>
       </template>
     </q-table>
 

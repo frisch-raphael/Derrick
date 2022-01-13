@@ -1,12 +1,12 @@
 import request from 'src/axios';
 import { Notify } from 'quasar';
 import { AxiosError } from 'axios';
-import { ApiRessource } from 'src/enums/enums';
+import { ApiRessource as string } from 'src/enums/enums';
 import store from 'src/store';
-import { useStore } from 'src/store';
 import { MutationType } from 'src/store/columbo/mutations-types';
 import { RessourceName } from 'src/enums/enums';
 import { ressourceNameToApi } from 'src/utils';
+import { ParentRessource } from '../../types/types';
 
 export interface IRestClient {
     // index(): Promise<void>;
@@ -17,16 +17,22 @@ export interface IRestClient {
 
 export default class RestClient implements IRestClient {
 
-    private store;
-    private ressource: ApiRessource;
+    private endpoint: string;
 
-    constructor(private ressourceName: RessourceName) {
-        this.store = useStore();
-        this.ressource = ressourceNameToApi[ressourceName];
+    constructor(private ressourceName: RessourceName, parentRessource?: ParentRessource) {
+        if (parentRessource?.id && parentRessource?.ressource) {
+            const parent = ressourceNameToApi[parentRessource.ressource];
+            const ressource = ressourceNameToApi[ressourceName];
+            this.endpoint = `${parent}/${parentRessource.id}${ressource}`;
+        }
+        else if (!parentRessource?.id && !parentRessource?.ressource) this.endpoint = ressourceNameToApi[ressourceName];
+        else throw Error('Wrong parameters given to RestClient');
+
+
     }
 
     get ressourceUiName() {
-        return this.ressource.replace('/', '').slice(0, -1);
+        return this.endpoint.replace('/', '').slice(0, -1);
     }
 
     private loading(ids: number[]) {
@@ -43,7 +49,7 @@ export default class RestClient implements IRestClient {
     public async delete(id: number[]) {
         this.loading(id);
         try {
-            await request({ method: 'delete', url: `${this.ressource}/${id.join(',')}` });
+            await request({ method: 'delete', url: `${this.endpoint}/${id.join(',')}` });
             Notify.create({
                 message: `${this.ressourceUiName} deleted`,
                 type: 'positive'
@@ -64,7 +70,7 @@ export default class RestClient implements IRestClient {
     public async update<T>(id: number, post: Record<string, any>) {
         this.loading([id]);
         try {
-            const ressource = await request<T>({ method: 'put', url: `${this.ressource}/${id}`, data: post });
+            const ressource = await request<T>({ method: 'put', url: `${this.endpoint}/${id}`, data: post });
             Notify.create({
                 message: `${this.ressourceUiName} '${this.getName(post)}' updated`,
                 type: 'positive'
@@ -85,7 +91,7 @@ export default class RestClient implements IRestClient {
 
     public async create<T>(post: Record<string, any>) {
         try {
-            const ressource = await request<T>({ method: 'post', url: `${this.ressource}`, data: { engagement: post } });
+            const ressource = await request<T>({ method: 'post', url: `${this.endpoint}`, data: { engagement: post } });
             Notify.create({
                 message: `${this.ressourceUiName} '${this.getName(post)}' created`,
                 type: 'positive'

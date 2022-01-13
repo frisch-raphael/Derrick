@@ -2,24 +2,21 @@
 /* eslint-disable vue/no-mutating-props */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
-import { TableItem, CardAction as CardAction, GenericRessource } from 'src/types/types';
+import { TableItem, GenericRessource } from 'src/types/types';
 import { LooseDictionary } from 'src/types/types';
 import { DataTest, RessourceName } from 'src/enums/enums';
 import { useStore } from 'src/store';
+import { RessourceActions } from 'src/ui/BaseTable/ressourceActions';
+import { capitalizeFirstLetter } from '../../../utils';
 const store = useStore();
 interface Props {
   tableItem: TableItem;
-  actions: CardAction[];
   ressourceName: RessourceName;
 }
-const props = withDefaults(defineProps<Props>(), {
-  actions: () => [],
-});
+const props = withDefaults(defineProps<Props>(), {});
 
-const launchAction = (action: CardAction, row: GenericRessource) => {
-  action.isRessourcePayloadNeed || action.function(row.id);
-  action.isRessourcePayloadNeed && action.function(row.id, row);
-};
+const ressourceActions = new RessourceActions(props.ressourceName, store);
+
 const getFilteredcols = (cols: LooseDictionary) =>
   cols.filter((col: { name: string; label: string; value: any }) => col.name !== 'title');
 const isLoading = (id: number) => store.getters.isRessourceLoading(props.ressourceName, id);
@@ -35,14 +32,39 @@ const isLoading = (id: number) => store.getters.isRessourceLoading(props.ressour
         :data-cy="DataTest.RessourceTableCardLoading"
         :indeterminate="isLoading(tableItem.row.id)"
       ></q-linear-progress>
-      <q-card-section>
-        <q-checkbox
-          v-model="tableItem.selected"
-          :data-cy="DataTest.RessourceTableCardCheckbox"
-          dense
-          :label="tableItem?.row.title"
-        />
-        <q-space></q-space>
+      <q-card-section class="q-pa-none">
+        <div class="row">
+          <q-checkbox
+            v-model="tableItem.selected"
+            class="q-pa-md"
+            :data-cy="DataTest.RessourceTableCardCheckbox"
+            dense
+            :label="tableItem?.row.title"
+          />
+          <q-space></q-space>
+          <q-btn
+            :data-cy="DataTest.RessourceTableCardUpdateBtn"
+            icon="mdi-open-in-new"
+            color="secondary"
+            flat
+            class="self-start q-pt-sm q-pa-xs"
+            size="sm"
+            @click="ressourceActions.openEditDialog(tableItem?.row)"
+          >
+            <q-tooltip>Edit {{ capitalizeFirstLetter(props.ressourceName) }}</q-tooltip>
+          </q-btn>
+          <q-btn
+            :data-cy="DataTest.RessourceTableCardDeleteBtn"
+            icon="mdi-close-circle"
+            color="red-10"
+            flat
+            class="self-start q-pt-sm q-pr-sm q-pa-xs"
+            size="sm"
+            @click="ressourceActions.deleteRowsInTableAndBackend([tableItem?.row.id])"
+          >
+            <q-tooltip>Delete {{ capitalizeFirstLetter(props.ressourceName) }}</q-tooltip>
+          </q-btn>
+        </div>
       </q-card-section>
       <q-separator />
       <q-list dense>
@@ -56,18 +78,7 @@ const isLoading = (id: number) => store.getters.isRessourceLoading(props.ressour
         </q-item>
       </q-list>
       <q-card-actions>
-        <q-btn
-          v-for="action in actions"
-          :key="action.icon"
-          rounded
-          size="sm"
-          :data-cy="'table-card-action-' + action.name"
-          :color="action.color"
-          :icon="action.icon"
-          @click="launchAction(action, tableItem.row)"
-        >
-          <q-tooltip>{{ action.tooltip }}</q-tooltip>
-        </q-btn>
+        <slot name="bottom-actions" :row="tableItem?.row"> </slot>
       </q-card-actions>
     </q-card>
   </div>

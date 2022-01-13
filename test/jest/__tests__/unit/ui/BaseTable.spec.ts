@@ -85,7 +85,6 @@ describe('a BaseTable', () => {
     const removeButton = wrapper.find("[data-cy='" + DataTest.RessourceTableCardDeleteBtn + "']");
     await removeButton.trigger('click');
     // eslint-disable-next-line @typescript-eslint/unbound-method
-    expect(restClient.delete).toHaveBeenCalled();
     expect(store.getters.RessourceTableRows(RessourceName.Engagement).length).toBe(rowNumber - 1);
   });
 

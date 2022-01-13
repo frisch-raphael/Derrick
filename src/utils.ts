@@ -2,6 +2,7 @@ import { ApiRessource } from 'src/enums/enums';
 import { DataTest, RessourceName } from 'src/enums/enums';
 import { engagementForm } from 'src/forms/engagement';
 import { RessourceFormType } from 'src/forms/types';
+import { companyForm } from './forms/company';
 
 export const prettyVariable = (variable: string) => {
     const noComplexChar = variable.replace(/[^a-zA-Z0-9+]+/gi, ' ');
@@ -25,5 +26,5 @@ export const ressourceNameToApi: { [key in RessourceName]: ApiRessource } = {
 export const ressourceNameToForm: { [key in RessourceName]: RessourceFormType<any> } = {
     engagement: engagementForm,
     contact: engagementForm,
-    company: engagementForm
+    company: companyForm
 };

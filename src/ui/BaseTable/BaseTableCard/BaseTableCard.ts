@@ -24,6 +24,9 @@ export default defineComponent({
             action.isRessourcePayloadNeed && action.function(row.id, row);
 
         };
+        const deleteRessource = (id: number) => {
+            
+        };
         return { launchAction };
     },
     methods: {

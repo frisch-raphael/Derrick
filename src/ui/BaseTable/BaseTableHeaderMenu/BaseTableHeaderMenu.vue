@@ -4,6 +4,7 @@ import { useStore } from 'src/store';
 import { HeaderAction, Row } from 'src/types/types';
 import { MutationType } from 'src/store/columbo/mutations-types';
 import { RessourceName, DataTest } from 'src/enums/enums';
+import { capitalizeFirstLetter } from 'src/utils';
 const store = useStore();
 const emit = defineEmits(['all-selected']);
 
@@ -42,7 +43,7 @@ const selectAll = ref(false);
     :data-cy="DataTest.RessourceTableSelectAll"
     @click="emit('all-selected', selectAll)"
   ></q-checkbox>
-  <span class="text-h6 q-mr-sm">{{ ressourceName }}s</span>
+  <span class="text-h6 q-mr-sm">{{ capitalizeFirstLetter(ressourceName) }}s</span>
   <q-btn
     size="sm"
     class="q-mb-xs"

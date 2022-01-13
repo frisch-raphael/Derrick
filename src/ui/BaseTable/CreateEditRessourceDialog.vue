@@ -4,18 +4,19 @@ import { RessourceName } from 'src/enums/enums';
 import { useStore } from 'src/store';
 import { MutationType } from 'src/store/columbo/mutations-types';
 import RestClient from 'src/classes/api/restClient';
-import { ressourceNameToForm } from 'src/utils';
+import { capitalizeFirstLetter, ressourceNameToForm } from 'src/utils';
 import BaseDialog from 'src/ui/BaseDialog.vue';
 import RessourceForm from 'src/components/RessourceForm.vue';
 import { AxiosError } from 'axios';
 import { CreateEditDialogState } from 'src/store/columbo/state';
-import { GenericRessource } from 'src/types/types';
+import { GenericRessource, ParentRessource } from 'src/types/types';
 import { Notify } from 'quasar';
 
 const store = useStore();
 
 const props = defineProps<{
   ressourceName: RessourceName;
+  parentRessource?: ParentRessource;
 }>();
 const emits = defineEmits(['loading-changed']);
 
@@ -50,14 +51,17 @@ const reinit = () => {
   newCreateEditRessource.value = { title: '' };
 };
 
-const title = computed(() =>
-  state.value.mode === 'create' ? `create new ${props.ressourceName}` : `edit ${props.ressourceName}`
-);
+const title = computed(() => {
+  if (props.parentRessource?.id) return `${capitalizeFirstLetter(props.ressourceName)}`;
+  return state.value.mode === 'create' ? `create new ${props.ressourceName}` : `edit ${props.ressourceName}`;
+});
 
 const createEditRessource = async () => {
   const mode = store.getters.createEditRessourceStatus(props.ressourceName).mode;
-
-  const client = new RestClient(props.ressourceName);
+  let client: RestClient;
+  client = props.parentRessource?.id
+    ? new RestClient(props.ressourceName, props.parentRessource)
+    : new RestClient(props.ressourceName);
   createEditDialogState.value = false;
   let ressourceFromBackend: GenericRessource;
   if (mode === 'create') {

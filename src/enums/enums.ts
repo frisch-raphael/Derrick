@@ -48,6 +48,8 @@ export enum DataTest {
     RessourceTableCardUpdateBtn = 'table-card-action-update',
     RessourceTableCardSaveBtn = 'table-card-action-save',
     RessourceTableCardCheckbox = 'base-table-card-checkbox',
+    EngagementTableCompanyBtn = 'engagement-table-company-btn',
+    EngagementTableContactsBtn = 'engagement-table-contacts-btn',
     EngagementFormStartDate = 'form-start_date',
     EngagementFormAssessmentType = 'form-assessment_type',
     EngagementFormTitle = 'form-title',

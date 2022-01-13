@@ -50,31 +50,38 @@ describe('The BaseTable', () => {
     });
 
     it('has load bars for edit, create', () => {
-        cy.intercept('POST', '/engagements', {}).as('createEngagement');
-        cy.intercept('PUT', '/engagements/*', { statusCode: 200 }).as('updateEngagement');
-
+        cy.intercept('POST', '/engagements', { delay: 500 }).as('createEngagement');
+        cy.intercept('PUT', '/engagements/*', { delay: 500 }).as('updateEngagement');
+        // edit
         cy.dataCy(DataTest.RessourceTableCardUpdateBtn).first().click().then(() => {
+
             cy.dataCy(DataTest.RessourceFormCreateEditBtn).click().then(() => {
-                cy.dataCy(DataTest.RessourceTableCardLoading).first().should('not.have.attr', 'aria-valuenow');
                 cy.dataCy(DataTest.RessourceTableLoading).should('have.attr', 'aria-valuenow');
-                cy.wait('@updateEngagement');
-                cy.dataCy(DataTest.RessourceTableCardLoading).first().should('have.attr', 'aria-valuenow');
+                cy.dataCy(DataTest.RessourceTableCardLoading).first().should('not.have.attr', 'aria-valuenow').then(() => {
+
+                    cy.wait('@updateEngagement', { timeout: 10000 }).then(() => {
+                        cy.dataCy(DataTest.RessourceTableCardLoading).first().should('have.attr', 'aria-valuenow');
+
+                    });
+                });
+
 
             });
         });
-
+        // create
         cy.dataCy(DataTest.RessourceTableOpenHeaderMenuBtn).click().then(() => {
             cy.dataCy(DataTest.RessourceTableHeaderCreateNew).click().then(() => {
                 initRessourceFormWithEngagement(makeFakeEngagement());
                 cy.dataCy(DataTest.RessourceFormCreateEditBtn).click().then(() => {
 
-                    cy.dataCy(DataTest.RessourceTableLoading).should('not.have.attr', 'aria-valuenow');
-                    cy.wait('@createEngagement');
-                    cy.dataCy(DataTest.RessourceTableLoading).should('have.attr', 'aria-valuenow');
+                    cy.dataCy(DataTest.RessourceTableLoading, { timeout: 10000 }).should('not.have.attr', 'aria-valuenow').then(() => {
+                        cy.wait('@createEngagement', { timeout: 10000 }).then(() => {
+                            cy.dataCy(DataTest.RessourceTableLoading).should('have.attr', 'aria-valuenow');
+                        });
+                    });
                 });
             });
         });
-
     });
 
     it('send correct params to api', () => {

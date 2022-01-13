@@ -1,3 +1,4 @@
+import { RessourceName } from 'src/enums/enums';
 
 export type Context = 'administration' | 'engagement'
 
@@ -162,7 +163,7 @@ type FunctionHeaderdAction = {
 }
 
 
-
+export type ParentRessource = { ressource: RessourceName, id?: number }
 export type CardAction = (FunctionCardAction) & FunctionlessCardAction
 export type HeaderAction = (FunctionHeaderdAction) & FunctionlessHeaderAction
 export type Row = { id: number, [x: string]: any }
