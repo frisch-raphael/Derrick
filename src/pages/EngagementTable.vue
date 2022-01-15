@@ -15,11 +15,11 @@ import { ParentRessource } from 'src/types/types';
 const store = useStore();
 
 const parentEngamement: ParentRessource = reactive({ ressource: RessourceName.Engagement, id: undefined });
-const engagements: Ref<IEngagement[]> = ref([]);
+const engagements: Ref<IEngagement[] | undefined> = ref(undefined);
 // TODO dans l'api
 onMounted(async () => {
   const response = await request<IEngagement[]>({ method: 'get', url: '/engagements' });
-  engagements.value = response.data;
+  engagements.value = response.data || [];
   await store.dispatch(ActionType.updateRessourceTable, {
     ressource: RessourceName.Engagement,
     rows: engagements.value,
@@ -41,8 +41,12 @@ const openCompanyDialog = () => {
 </script>
 
 <template>
-  <q-linear-progress v-if="!engagements.length" indeterminate></q-linear-progress>
-  <base-table :columns="engagementColumns" :ressource-name="RessourceName.Engagement">
+  <q-linear-progress
+    v-if="engagements === undefined"
+    indeterminate
+    :data-cy="DataTest.EngagementTableLoading"
+  ></q-linear-progress>
+  <base-table v-else :columns="engagementColumns" :ressource-name="RessourceName.Engagement">
     <template #card-bottom-actions="{ row }">
       <q-btn
         :data-cy="DataTest.EngagementTableCompanyBtn"

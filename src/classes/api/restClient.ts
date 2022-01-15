@@ -32,7 +32,7 @@ export default class RestClient implements IRestClient {
     }
 
     get ressourceUiName() {
-        return this.endpoint.replace('/', '').slice(0, -1);
+        return this.ressourceName.replace('/', '').slice(0, -1);
     }
 
     private loading(ids: number[]) {
@@ -79,7 +79,7 @@ export default class RestClient implements IRestClient {
         } catch (error) {
             const err = error as AxiosError;
             Notify.create({
-                message: `${this.ressourceUiName} update failed : ${err.message}`,
+                message: `${this.ressourceUiName} '${this.getName(post)}' update failed : ${err.message}`,
                 type: 'negative'
             });
             throw error;
@@ -91,7 +91,7 @@ export default class RestClient implements IRestClient {
 
     public async create<T>(post: Record<string, any>) {
         try {
-            const ressource = await request<T>({ method: 'post', url: `${this.endpoint}`, data: { engagement: post } });
+            const ressource = await request<T>({ method: 'post', url: `${this.endpoint}`, data: { [this.ressourceName]: post } });
             Notify.create({
                 message: `${this.ressourceUiName} '${this.getName(post)}' created`,
                 type: 'positive'
@@ -100,7 +100,7 @@ export default class RestClient implements IRestClient {
         } catch (error) {
             const err = error as AxiosError;
             Notify.create({
-                message: `${this.ressourceUiName} creation failed : ${err.message}`,
+                message: `${this.ressourceUiName} '${this.getName(post)}' creation failed : ${err.message}`,
                 type: 'negative'
             });
             throw error;
@@ -108,7 +108,7 @@ export default class RestClient implements IRestClient {
     }
 
     private getName(post: Record<string, string>) {
-        return post.title ?? post.name ?? '';
+        return post.title ?? post.full_name ?? post.name ?? '';
     }
 
 

@@ -12,7 +12,30 @@ describe('The EngagementTable', () => {
         cy.visit('/', { timeout: 15000 });
 
     });
+    it('error popup if error', () => {
+        cy.intercept('DELETE', '/engagements/*', {
+            statusCode: 404
+        });
+        cy.intercept('POST', '/engagements', {
+            statusCode: 404
+        });
+        cy.dataCy(DataTest.RessourceTableCard).then(() => {
+            cy.dataCy(DataTest.RessourceTableOpenHeaderMenuBtn).click();
+            cy.dataCy(DataTest.RessourceTableHeaderCreateNew).click();
+            initRessourceFormWithEngagement(makeFakeEngagement());
+            cy.dataCy(DataTest.RessourceFormCreateEditBtn).click().then(() => {
+                cy.get('.bg-negative.q-notification').should('exist');
 
+            });
+
+            // cy.get(FullDataTest(DataTest.RessourceForm)).click();
+        });
+        cy.dataCy(DataTest.RessourceTableCard).then(() => {
+            cy.dataCy(DataTest.RessourceTableCardDeleteBtn).first().click();
+            cy.get('.bg-negative.q-notification').should('exist');
+            //
+        });
+    });
     it('can edit a ressource', () => {
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const editedEngagement = makeFakeEngagement();
@@ -93,30 +116,6 @@ describe('The EngagementTable', () => {
         });
     });
 
-    it('error popup if error', () => {
-        cy.intercept('DELETE', '/engagements/*', {
-            statusCode: 404
-        });
-        cy.intercept('POST', '/engagements/*', {
-            statusCode: 404
-        });
-        cy.dataCy(DataTest.RessourceTableCard).then(() => {
-            cy.dataCy(DataTest.RessourceTableCardDeleteBtn).first().click();
-            cy.get('.bg-negative.q-notification').should('exist');
-            //
-        });
-        cy.dataCy(DataTest.RessourceTableCard).then(() => {
-            cy.dataCy(DataTest.RessourceTableOpenHeaderMenuBtn).click();
-            cy.dataCy(DataTest.RessourceTableHeaderCreateNew).click();
-            cy.get(t('form-title')).type('test');
-            cy.get(t('form-assessment_type')).type('test');
-            cy.dataCy(DataTest.RessourceFormCreateEditBtn).click().then(() => {
-                cy.get('.bg-negative.q-notification').should('exist');
 
-            });
-
-            // cy.get(FullDataTest(DataTest.RessourceForm)).click();
-        });
-    });
 
 });

@@ -85,7 +85,10 @@ const typeSlotProps = (slotProps: LooseDictionary) => {
       </template>
     </q-table>
 
-    <q-markup-table v-if="!store.getters.RessourceTableRows(ressourceName).length" data-cy="no-data">
+    <q-markup-table
+      v-if="store.getters.RessourceTableRows(ressourceName).length === 0"
+      :data-cy="DataTest.RessourceFormNoData"
+    >
       <q-banner>
         <template #avatar>
           <q-icon color="primary" name="mdi-emoticon-sad-outline" />

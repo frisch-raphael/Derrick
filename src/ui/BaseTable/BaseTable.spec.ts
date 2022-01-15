@@ -58,14 +58,10 @@ describe('The BaseTable', () => {
             cy.dataCy(DataTest.RessourceFormCreateEditBtn).click().then(() => {
                 cy.dataCy(DataTest.RessourceTableLoading).should('have.attr', 'aria-valuenow');
                 cy.dataCy(DataTest.RessourceTableCardLoading).first().should('not.have.attr', 'aria-valuenow').then(() => {
-
                     cy.wait('@updateEngagement', { timeout: 10000 }).then(() => {
                         cy.dataCy(DataTest.RessourceTableCardLoading).first().should('have.attr', 'aria-valuenow');
-
                     });
                 });
-
-
             });
         });
         // create
@@ -171,11 +167,13 @@ describe('The BaseTable', () => {
 
     it('does not display "no data" warning when rows > 0', () => {
         cy.dataCy('no-data').should('not.exist');
+
     });
 
-    it('display "no data" warning when rows > 0', () => {
+    it('display "no data" warning when no rows, but no loading bar', () => {
         store.commit(MutationType.updateRessourceTable, { ressource: RessourceName.Engagement, rows: [] });
         cy.dataCy('no-data').should('exist');
+        cy.dataCy(DataTest.RessourceTableLoading).should('have.attr', 'aria-valuenow');
     });
 
     it('"delete all" disabled if nothing checked', () => {
