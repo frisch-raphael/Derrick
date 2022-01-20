@@ -6,8 +6,8 @@ import BaseTableHeaderMenu from 'src/ui/BaseTable/BaseTableHeaderMenu/BaseTableH
 import CreateEditRessourceDialog from 'src/ui/BaseTable/CreateEditRessourceDialog.vue';
 import { Columns, ParentRessource, Row, TableItem } from 'src/types/types';
 import { RessourceName, DataTest } from 'src/enums/enums';
-import { useStore } from 'src/store';
 import { LooseDictionary } from 'src/types/types';
+import { useStore } from 'src/stores';
 
 const store = useStore();
 
@@ -34,7 +34,7 @@ const updateFilter = (new_filter: string) => {
 };
 
 const selectAllClicked = (checked: boolean) => {
-  selected.value = checked ? store.getters.RessourceTableRows(props.ressourceName) ?? [] : [];
+  selected.value = checked ? store.ressourceTableRows[props.ressourceName] ?? [] : [];
 };
 
 const typeSlotProps = (slotProps: LooseDictionary) => {
@@ -51,7 +51,7 @@ const typeSlotProps = (slotProps: LooseDictionary) => {
     ></q-linear-progress>
     <q-table
       v-model:selected="selected"
-      :rows="store.getters.RessourceTableRows(ressourceName)"
+      :rows="store.ressourceTableRows[props.ressourceName]"
       :columns="columns"
       row-key="id"
       selection="multiple"
@@ -87,7 +87,7 @@ const typeSlotProps = (slotProps: LooseDictionary) => {
     </q-table>
 
     <q-markup-table
-      v-if="store.getters.RessourceTableRows(ressourceName)?.length === 0"
+      v-if="store.ressourceTableRows[props.ressourceName]?.length === 0"
       :data-cy="DataTest.RessourceFormNoData"
     >
       <q-banner>

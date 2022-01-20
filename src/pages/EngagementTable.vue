@@ -5,13 +5,11 @@ import { IEngagement } from 'src/dtos/engagement';
 import request from 'src/axios';
 import BaseTable from 'src/ui/BaseTable/BaseTable.vue';
 import { RessourceName, DataTest } from 'src/enums/enums';
-import { useStore } from 'src/store';
-import { ActionType } from 'src/store/columbo/action-types';
 import { engagementColumns } from 'src/pages/columns';
 import CreateEditRessourceDialog from '../ui/BaseTable/CreateEditRessourceDialog.vue';
-import { MutationType } from 'src/store/columbo/mutations-types';
 import { GenericRessource } from 'src/types/types';
 import { useRouter } from 'vue-router';
+import { useStore } from 'src/stores';
 
 const store = useStore();
 const router = useRouter();
@@ -20,18 +18,14 @@ const router = useRouter();
 // TODO dans l'api
 onMounted(async () => {
   const response = await request<IEngagement[]>({ method: 'get', url: '/engagements' });
-  await store.dispatch(ActionType.updateRessourceTable, {
-    ressourceName: RessourceName.Engagement,
-    rows: response.data || [],
-  });
+  store.updateRessourceTable(RessourceName.Engagement, response.data || []);
 });
 
-const engagements = computed(
-  () => store.getters.RessourceTableRows(RessourceName.Engagement) as IEngagement[]
-);
+const engagements = computed(() => store.ressourceTableRows.engagement as IEngagement[]);
+
 const companyClicked = (ressource: GenericRessource) => {
   const company = engagements.value?.find((e) => e.id === ressource.id)?.company;
-  store.commit(MutationType.updateCreateEditRessourceState, {
+  store.updateCreateEditRessourceState({
     isOpen: true,
     mode: company ? 'edit' : 'create',
     ressourceName: RessourceName.Company,

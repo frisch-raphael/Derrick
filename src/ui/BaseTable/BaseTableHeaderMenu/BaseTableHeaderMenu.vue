@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
-import { useStore } from 'src/store';
 import { Row, ParentRessource } from 'src/types/types';
 import { MutationType } from 'src/store/columbo/mutations-types';
 import { RessourceName, DataTest } from 'src/enums/enums';
 import { capitalizeFirstLetter } from 'src/utils';
 import { RessourceActions } from 'src/ui/BaseTable/ressourceActions';
+import { useStore } from 'src/stores';
 const store = useStore();
 const emit = defineEmits(['all-selected']);
 
@@ -14,17 +14,14 @@ const props = defineProps<{
   selected: Row[];
   parentRessource?: ParentRessource;
 }>();
-const ressourceActions = new RessourceActions(props.ressourceName, store, props.parentRessource);
+const ressourceActions = new RessourceActions(props.ressourceName, props.parentRessource);
 
 const menuState = computed({
   get(): boolean {
-    return !!store.state.columbo.isHeaderOpenFor[props.ressourceName];
+    return !!store.isHeaderOpenFor[props.ressourceName];
   },
   set(newState: boolean): void {
-    store.commit(MutationType.updateRessourceMenu, {
-      ressourceName: props.ressourceName,
-      isOpen: newState,
-    });
+    store.updateRessourceMenu(props.ressourceName, newState);
   },
 });
 

@@ -17,15 +17,14 @@ export default {
 
 <script lang="ts" setup>
 import { Notify } from 'quasar';
-import { useStore } from 'src/store';
 import { RessourceName, DataTest } from 'src/enums/enums';
 import { onMounted, ref } from 'vue';
 import BaseTable from '../ui/BaseTable/BaseTable.vue';
 import { ParentRessource } from 'src/types/types';
 import { ressourceConfig } from '../utils';
-import { ActionType } from 'src/store/columbo/action-types';
 import RestClient from 'src/classes/api/restClient';
 import { IContact } from 'src/dtos/contact';
+import { useStore } from 'src/stores';
 
 const props = defineProps<{
   parentEngagementId: string;
@@ -50,10 +49,7 @@ onMounted(async () => {
   };
   try {
     const contacts = await new RestClient(RessourceName.Contact, parentRessource).index<IContact>();
-    await store.dispatch(ActionType.updateRessourceTable, {
-      ressourceName: RessourceName.Contact,
-      rows: contacts || [],
-    });
+    store.updateRessourceTable(RessourceName.Contact, contacts || []);
   } catch (err) {
     console.error(err);
   }

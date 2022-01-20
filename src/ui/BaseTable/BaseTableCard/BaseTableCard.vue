@@ -5,9 +5,9 @@
 import { TableItem, ParentRessource } from 'src/types/types';
 import { LooseDictionary } from 'src/types/types';
 import { DataTest, RessourceName } from 'src/enums/enums';
-import { useStore } from 'src/store';
 import { RessourceActions } from 'src/ui/BaseTable/ressourceActions';
 import { capitalizeFirstLetter } from 'src/utils';
+import { useStore } from 'src/stores';
 const store = useStore();
 interface Props {
   tableItem: TableItem;
@@ -18,11 +18,11 @@ const props = withDefaults(defineProps<Props>(), {
   parentRessource: undefined,
 });
 
-const ressourceActions = new RessourceActions(props.ressourceName, store, props.parentRessource);
+const ressourceActions = new RessourceActions(props.ressourceName, props.parentRessource);
 
 const getFilteredcols = (cols: LooseDictionary) =>
   cols.filter((col: { name: string; label: string; value: any }) => col.name !== 'title');
-const isLoading = (id: number) => store.getters.isRessourceLoading(props.ressourceName, id);
+const isLoading = (id: number) => store.ressourceTableLoading[props.ressourceName]?.includes(id);
 </script>
 
 <template>

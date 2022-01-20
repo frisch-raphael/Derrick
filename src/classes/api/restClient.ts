@@ -1,12 +1,13 @@
 import request from 'src/axios';
 import { Notify } from 'quasar';
 import { AxiosError } from 'axios';
-import store from 'src/store';
+// import store from 'src/store';
 import { MutationType } from 'src/store/columbo/mutations-types';
 import { RessourceName } from 'src/enums/enums';
 import { ressourceNameToApi } from 'src/utils';
 import { ParentRessource } from '../../types/types';
 import { capitalizeFirstLetter } from '../../utils';
+import { useStore } from 'src/stores';
 
 export interface IRestClient {
     // index(): Promise<void>;
@@ -18,6 +19,7 @@ export interface IRestClient {
 export default class RestClient implements IRestClient {
 
     private endpoint: string;
+    private store = useStore();
 
     constructor(private ressourceName: RessourceName, private parentRessource?: ParentRessource) {
         if (parentRessource?.ressource?.id && parentRessource?.ressourceName) {
@@ -39,24 +41,16 @@ export default class RestClient implements IRestClient {
 
     private loading(ids: number[]) {
         // ressource is loading
-        store.commit(MutationType.setRessourceTableLoading, {
-            ressourceName: this.ressourceName,
-            ids: ids,
-        });
+        this.store.setRessourceTableLoading(this.ressourceName, ids);
         // parent is loading if it exists
         if (!this.parentRessource?.ressourceName || !this.parentRessource?.ressource?.id) return;
-        store.commit(MutationType.setRessourceTableLoading, {
-            ressourceName: this.parentRessource?.ressourceName,
-            ids: [this.parentRessource?.ressource?.id],
-        });
+        this.store.setRessourceTableLoading(this.parentRessource?.ressourceName, [this.parentRessource?.ressource?.id]);
     }
 
     private unload() {
-        store.commit(MutationType.setRessourceTableLoading,
-            { ressourceName: this.ressourceName, ids: [] });
+        this.store.setRessourceTableLoading(this.ressourceName, []);
         if (!this.parentRessource?.ressourceName || !this.parentRessource?.ressource?.id) return;
-        store.commit(MutationType.setRessourceTableLoading,
-            { ressourceName: this.parentRessource?.ressourceName, ids: [] });
+        this.store.setRessourceTableLoading(this.parentRessource?.ressourceName, []);
     }
 
     public async index<T>() {

@@ -2,8 +2,6 @@ import { defineStore } from 'pinia';
 import { RessourceName } from 'src/enums/enums';
 import { GenericRessource, ParentRessource, Row } from 'src/types/types';
 
-
-
 type OpenedStatus = { [key in RessourceName]?: boolean }
 type CreateEditDialogState = {
     isOpen?: boolean,
@@ -17,12 +15,7 @@ type RessourceTableRows = { [key in RessourceName]?: Row[] }
 type RessourceTableLoading = { [key in RessourceName]?: number[] }
 
 
-export type OpenStateUpdate = { ressourceName: RessourceName, isOpen: boolean }
 export type CreateEditRessourceStateUpdate = { ressourceName: RessourceName } & CreateEditDialogState
-export type RessourceTableUpdate = { ressourceName: RessourceName, rows: Row[] }
-export type RessourceTableCreateEdit = { ressourceName: RessourceName, row: Row }
-export type RessourceTableDelete = { ressourceName: RessourceName, ids: number[] }
-export type RessourceTableLoadingUpdate = { ressourceName: RessourceName, ids: number[] }
 
 export const useStore = defineStore('main', {
     state: () => ({
@@ -31,18 +24,6 @@ export const useStore = defineStore('main', {
         ressourceTableRows: {} as RessourceTableRows,
         ressourceTableLoading: {} as RessourceTableLoading,
     }),
-    getters: {
-        menuHeaderOpenedStatus: (state) => (ressource: RessourceName) => !!state.isHeaderOpenFor[ressource],
-        createEditRessourceStatus: (state) => (ressource: RessourceName) => {
-            const createEditStatus = state.createEditRessourceStatus[ressource];
-            if (!createEditStatus) throw new Error('no createEditStatus for' + ressource);
-            return createEditStatus;
-        },
-        RessourceTableRows: (state) => <T = Row[]>(ressource: RessourceName) =>
-            state.ressourceTableRows[ressource] as T[] | undefined,
-        isRessourceLoading: (state) => (ressource: RessourceName, id: number) =>
-            !!state.ressourceTableLoading[ressource]?.includes(id),
-    },
     actions: {
         updateCreateEditRessourceState(update: CreateEditRessourceStateUpdate) {
             this.createEditRessourceStatus[update.ressourceName] = {
@@ -53,24 +34,33 @@ export const useStore = defineStore('main', {
                 parentRessource: update.parentRessource
             };
         },
-        updateRessourceMenu(update: OpenStateUpdate) {
-            this.isHeaderOpenFor[update.ressourceName] = update.isOpen;
+        reinitCreateEditRessourceState(ressourceName: RessourceName) {
+            this.createEditRessourceStatus[ressourceName] = {};
         },
-        updateRessourceTable(update: RessourceTableUpdate) {
-            this.ressourceTableRows[update.ressourceName] = update.rows;
+        createEditRessourceFormOpenClose(ressourceName: RessourceName, isOpen: boolean) {
+            if (!this.createEditRessourceStatus[ressourceName]) {
+                throw Error('No createEdit for ' + ressourceName);
+            }
+            (this.createEditRessourceStatus[ressourceName] as CreateEditDialogState).isOpen = isOpen;
         },
-        destroyRessourceTableRows(destroy: RessourceTableDelete) {
-            const currentRows = this.ressourceTableRows[destroy.ressourceName];
-            this.ressourceTableRows[destroy.ressourceName] = currentRows?.filter(r => !destroy.ids.includes(r.id));
+        updateRessourceMenu(ressourceName: RessourceName, isOpen: boolean) {
+            this.isHeaderOpenFor[ressourceName] = isOpen;
         },
-        createEditOneRessourceTableRow(createEdit: RessourceTableCreateEdit) {
-            const currentRows = this.ressourceTableRows[createEdit.ressourceName] ?? [];
-            currentRows.map(r => r.id).includes(createEdit.row.id) ?
-                this.ressourceTableRows[createEdit.ressourceName] = currentRows.map(r => r.id === createEdit.row.id ? createEdit.row : r)
-                : this.ressourceTableRows[createEdit.ressourceName] = [...currentRows, createEdit.row];
+        updateRessourceTable(ressourceName: RessourceName, rows: Row[]) {
+            this.ressourceTableRows[ressourceName] = rows;
         },
-        setRessourceTableLoading(update: RessourceTableLoadingUpdate) {
-            this.ressourceTableLoading[update.ressourceName] = update.ids;
+        destroyRessourceTableRows(ressourceName: RessourceName, ids: number[]) {
+            const currentRows = this.ressourceTableRows[ressourceName];
+            this.ressourceTableRows[ressourceName] = currentRows?.filter(r => !ids.includes(r.id));
+        },
+        createEditOneRessourceTableRow(ressourceName: RessourceName, row: Row) {
+            const currentRows = this.ressourceTableRows[ressourceName] ?? [];
+            currentRows.map(r => r.id).includes(row.id) ?
+                this.ressourceTableRows[ressourceName] = currentRows.map(r => r.id === row.id ? row : r)
+                : this.ressourceTableRows[ressourceName] = [...currentRows, row];
+        },
+        setRessourceTableLoading(ressourceName: RessourceName, ids: number[]) {
+            this.ressourceTableLoading[ressourceName] = ids;
         },
     },
 });

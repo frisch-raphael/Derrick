@@ -1,18 +1,17 @@
 import { IRestClient } from 'src/classes/api/restClient';
-import { MutationType } from 'src/store/columbo/mutations-types';
 import { RessourceName } from 'src/enums/enums';
-import { Store } from 'src/store/index';
 import { AxiosError } from 'axios';
 import RestClient from 'src/classes/api/restClient';
 import { GenericRessource } from 'src/types/types';
 import { ParentRessource } from '../../types/types';
+import { useStore } from '../../stores/index';
 
 export class RessourceActions {
     private restClient: IRestClient
+    private store = useStore()
 
     constructor(
         private ressourceName: RessourceName,
-        private store: Store,
         private parentRessource?: ParentRessource,
     ) {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
@@ -22,10 +21,7 @@ export class RessourceActions {
     public async deleteRowsInTableAndBackend(ids: number[] | number) {
         try {
             if (typeof ids === 'number') ids = [ids];
-            this.store.commit(MutationType.destroyRessourceTableRows, {
-                ressourceName: this.ressourceName,
-                ids: ids
-            });
+            this.store.destroyRessourceTableRows(this.ressourceName, ids);
             await this.restClient.delete(ids);
         } catch (err) {
             const error = err as AxiosError;
@@ -34,8 +30,7 @@ export class RessourceActions {
     }
 
     public openEditDialog(ressource: GenericRessource) {
-        this.store.commit(
-            MutationType.updateCreateEditRessourceState,
+        this.store.updateCreateEditRessourceState(
             {
                 isOpen: true,
                 ressourceName: this.ressourceName,
@@ -46,8 +41,7 @@ export class RessourceActions {
     }
 
     public openCreateDialog() {
-        this.store.commit(
-            MutationType.updateCreateEditRessourceState,
+        this.store.updateCreateEditRessourceState(
             {
                 isOpen: true,
                 ressourceName: this.ressourceName,
