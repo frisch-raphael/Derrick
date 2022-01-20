@@ -94,9 +94,9 @@ describe('the engagement table', () => {
         // @ts-ignore
         ressourceForm.vm.$emit('ressource-form-update', mockEngagements[0]);
         const createBtn = engagementTable.findComponent("[data-cy='engagement-create-btn']");
-        const engagementInStoreBefore = store.getters.RessourceTableRows(RessourceName.Engagement).length;
+        const engagementInStoreBefore = store.getters.RessourceTableRows(RessourceName.Engagement)?.length || 0;
         await (createBtn as unknown as { trigger: (x: string) => Promise<void> }).trigger('click');
-        const engagementInStoreAfter = store.getters.RessourceTableRows(RessourceName.Engagement).length;
+        const engagementInStoreAfter = store.getters.RessourceTableRows(RessourceName.Engagement)?.length || 0;
         expect(engagementInStoreAfter).toBe(engagementInStoreBefore + 1);
     });
 });

@@ -1,6 +1,7 @@
 import { ICompany } from 'src/dtos/company';
 import { Scoring } from 'src/enums/enums';
 import { EngagementState } from '../enums/enums';
+import { IContact } from './contact';
 
 export interface IEngagement {
     id: number,
@@ -9,9 +10,10 @@ export interface IEngagement {
     start_date: string,
     end_date: string,
     scoring: Scoring,
-    language: string
-    state: EngagementState
-    company?: ICompany
+    language: string,
+    state: EngagementState,
+    company?: ICompany,
+    contacts?: IContact[]
 }
 
 export class Engagement implements IEngagement {

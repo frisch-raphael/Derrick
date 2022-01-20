@@ -20,7 +20,7 @@ describe('a CreateRessourceDialog', () => {
     beforeEach(() => {
         store.commit(MutationType.updateCreateEditRessourceState,
             {
-                ressource: RessourceName.Engagement,
+                ressourceName: RessourceName.Engagement,
                 isOpen: true,
                 mode: 'edit',
                 ressourceToEdit: fakeEngagement
@@ -40,7 +40,7 @@ describe('a CreateRessourceDialog', () => {
         cy.dataCy(DataTest.DialogBase).should('contain.text', `edit ${RessourceName.Engagement}`).then(() => {
             store.commit(MutationType.updateCreateEditRessourceState,
                 {
-                    ressource: RessourceName.Engagement,
+                    ressourceName: RessourceName.Engagement,
                     isOpen: true,
                     mode: 'create',
                     ressourceToEdit: fakeEngagement

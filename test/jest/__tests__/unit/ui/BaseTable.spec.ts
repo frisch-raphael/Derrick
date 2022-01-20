@@ -59,7 +59,7 @@ const wrapper = mount(BaseTable,
 
 describe('a BaseTable', () => {
   beforeEach(() => {
-    store.commit(MutationType.updateRessourceTable, { ressource: RessourceName.Engagement, rows: rows });
+    store.commit(MutationType.updateRessourceTable, { ressourceName: RessourceName.Engagement, rows: rows });
     // Clear all instances and calls to constructor and all methods:
     mockedRestClient.mockClear();
 

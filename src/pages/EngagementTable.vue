@@ -1,6 +1,6 @@
 <script setup lang="ts">
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-import { ref, Ref, reactive, onMounted } from 'vue';
+import { onMounted, computed } from 'vue';
 import { IEngagement } from 'src/dtos/engagement';
 import request from 'src/axios';
 import BaseTable from 'src/ui/BaseTable/BaseTable.vue';
@@ -10,32 +10,37 @@ import { ActionType } from 'src/store/columbo/action-types';
 import { engagementColumns } from 'src/pages/columns';
 import CreateEditRessourceDialog from '../ui/BaseTable/CreateEditRessourceDialog.vue';
 import { MutationType } from 'src/store/columbo/mutations-types';
-import { ParentRessource } from 'src/types/types';
+import { GenericRessource } from 'src/types/types';
+import { useRouter } from 'vue-router';
 
 const store = useStore();
+const router = useRouter();
 
-const parentEngamement: ParentRessource = reactive({ ressource: RessourceName.Engagement, id: undefined });
-const engagements: Ref<IEngagement[] | undefined> = ref(undefined);
+// const engagements: Ref<IEngagement[] | undefined> = ref(undefined);
 // TODO dans l'api
 onMounted(async () => {
   const response = await request<IEngagement[]>({ method: 'get', url: '/engagements' });
-  engagements.value = response.data || [];
   await store.dispatch(ActionType.updateRessourceTable, {
-    ressource: RessourceName.Engagement,
-    rows: engagements.value,
+    ressourceName: RessourceName.Engagement,
+    rows: response.data || [],
   });
 });
 
-const companyClicked = (id: number) => {
-  parentEngamement.id = id;
-  openCompanyDialog();
-};
-const openCompanyDialog = () => {
+const engagements = computed(
+  () => store.getters.RessourceTableRows(RessourceName.Engagement) as IEngagement[]
+);
+const companyClicked = (ressource: GenericRessource) => {
+  const company = engagements.value?.find((e) => e.id === ressource.id)?.company;
   store.commit(MutationType.updateCreateEditRessourceState, {
     isOpen: true,
-    mode: 'create',
-    ressource: RessourceName.Company,
-    ressourceToEdit: { id: 0 },
+    mode: company ? 'edit' : 'create',
+    ressourceName: RessourceName.Company,
+    ressourceToEdit: company,
+    isParentStoreTarget: true,
+    parentRessource: {
+      ressourceName: RessourceName.Engagement,
+      ressource: ressource,
+    },
   });
 };
 </script>
@@ -46,36 +51,26 @@ const openCompanyDialog = () => {
     indeterminate
     :data-cy="DataTest.EngagementTableLoading"
   ></q-linear-progress>
-  <base-table v-else :columns="engagementColumns" :ressource-name="RessourceName.Engagement">
-    <template #card-bottom-actions="{ row }">
+  <base-table v-else :columns="engagementColumns" :ressource-name="RessourceName.Engagement" :grid="true">
+    <template #card-bottom-actions="{ row: engagementRow }">
       <q-btn
         :data-cy="DataTest.EngagementTableCompanyBtn"
         icon="mdi-domain"
         size="sm"
         color="black"
         rounded
-        @click="companyClicked(row.id)"
-        ><q-tooltip>Manage associated company</q-tooltip></q-btn
+        @click="companyClicked(engagementRow)"
+        ><q-tooltip>Company</q-tooltip></q-btn
       >
-      <q-btn size="sm" color="blue" rounded icon="mdi-content-save"
-        ><q-tooltip>Manage associated contacts</q-tooltip></q-btn
+      <q-btn
+        size="sm"
+        color="blue"
+        rounded
+        icon="mdi-account-multiple"
+        @click="router.push({ name: 'contacts', params: { parentEngagementId: engagementRow.id } })"
+        ><q-tooltip>Contacts</q-tooltip></q-btn
       >
     </template>
   </base-table>
-  <create-edit-ressource-dialog
-    :parent-ressource="parentEngamement"
-    :ressource-name="RessourceName.Company"
-  ></create-edit-ressource-dialog>
+  <create-edit-ressource-dialog :ressource-name="RessourceName.Company"></create-edit-ressource-dialog>
 </template>
-<!-- <q-btn
-          v-for="action in actions"
-          :key="action.icon"
-          rounded
-          size="sm"
-          :data-cy="'table-card-action-' + action.name"
-          :color="action.color"
-          :icon="action.icon"
-          @click="launchAction(action, tableItem.row)"
-        >
-          <q-tooltip>{{ action.tooltip }}</q-tooltip>
-        </q-btn> -->

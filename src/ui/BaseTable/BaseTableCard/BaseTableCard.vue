@@ -2,20 +2,23 @@
 /* eslint-disable vue/no-mutating-props */
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
-import { TableItem, GenericRessource } from 'src/types/types';
+import { TableItem, ParentRessource } from 'src/types/types';
 import { LooseDictionary } from 'src/types/types';
 import { DataTest, RessourceName } from 'src/enums/enums';
 import { useStore } from 'src/store';
 import { RessourceActions } from 'src/ui/BaseTable/ressourceActions';
-import { capitalizeFirstLetter } from '../../../utils';
+import { capitalizeFirstLetter } from 'src/utils';
 const store = useStore();
 interface Props {
   tableItem: TableItem;
   ressourceName: RessourceName;
+  parentRessource?: ParentRessource;
 }
-const props = withDefaults(defineProps<Props>(), {});
+const props = withDefaults(defineProps<Props>(), {
+  parentRessource: undefined,
+});
 
-const ressourceActions = new RessourceActions(props.ressourceName, store);
+const ressourceActions = new RessourceActions(props.ressourceName, store, props.parentRessource);
 
 const getFilteredcols = (cols: LooseDictionary) =>
   cols.filter((col: { name: string; label: string; value: any }) => col.name !== 'title');

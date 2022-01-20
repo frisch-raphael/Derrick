@@ -1,6 +1,3 @@
-import { installQuasarPlugin } from '@quasar/quasar-app-extension-testing-e2e-cypress';
-import { t } from 'app/test/cypress/utils';
-import { IEngagement } from 'src/dtos/engagement';
 import { DataTest } from 'src/enums/enums';
 import { makeFakeEngagement } from 'src/factories/mock/engagement';
 import { initRessourceFormWithEngagement, reinitRessourceFormWithEngagement } from '../utils';

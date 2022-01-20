@@ -1,12 +1,12 @@
 import request from 'src/axios';
 import { Notify } from 'quasar';
 import { AxiosError } from 'axios';
-import { ApiRessource as string } from 'src/enums/enums';
 import store from 'src/store';
 import { MutationType } from 'src/store/columbo/mutations-types';
 import { RessourceName } from 'src/enums/enums';
 import { ressourceNameToApi } from 'src/utils';
 import { ParentRessource } from '../../types/types';
+import { capitalizeFirstLetter } from '../../utils';
 
 export interface IRestClient {
     // index(): Promise<void>;
@@ -19,31 +19,58 @@ export default class RestClient implements IRestClient {
 
     private endpoint: string;
 
-    constructor(private ressourceName: RessourceName, parentRessource?: ParentRessource) {
-        if (parentRessource?.id && parentRessource?.ressource) {
-            const parent = ressourceNameToApi[parentRessource.ressource];
+    constructor(private ressourceName: RessourceName, private parentRessource?: ParentRessource) {
+        if (parentRessource?.ressource?.id && parentRessource?.ressourceName) {
+            const parent = ressourceNameToApi[parentRessource.ressourceName];
             const ressource = ressourceNameToApi[ressourceName];
-            this.endpoint = `${parent}/${parentRessource.id}${ressource}`;
+            this.endpoint = `${parent}/${parentRessource.ressource.id}${ressource}`;
         }
-        else if (!parentRessource?.id && !parentRessource?.ressource) this.endpoint = ressourceNameToApi[ressourceName];
+        else if (!parentRessource?.ressource?.id && !parentRessource?.ressourceName) {
+            this.endpoint = ressourceNameToApi[ressourceName];
+        }
         else throw Error('Wrong parameters given to RestClient');
 
 
     }
 
     get ressourceUiName() {
-        return this.ressourceName.replace('/', '').slice(0, -1);
+        return capitalizeFirstLetter(this.ressourceName);
     }
 
     private loading(ids: number[]) {
+        // ressource is loading
         store.commit(MutationType.setRessourceTableLoading, {
-            ressource: this.ressourceName,
+            ressourceName: this.ressourceName,
             ids: ids,
+        });
+        // parent is loading if it exists
+        if (!this.parentRessource?.ressourceName || !this.parentRessource?.ressource?.id) return;
+        store.commit(MutationType.setRessourceTableLoading, {
+            ressourceName: this.parentRessource?.ressourceName,
+            ids: [this.parentRessource?.ressource?.id],
         });
     }
 
     private unload() {
-        store.commit(MutationType.setRessourceTableLoading, { ressource: this.ressourceName, ids: [] });
+        store.commit(MutationType.setRessourceTableLoading,
+            { ressourceName: this.ressourceName, ids: [] });
+        if (!this.parentRessource?.ressourceName || !this.parentRessource?.ressource?.id) return;
+        store.commit(MutationType.setRessourceTableLoading,
+            { ressourceName: this.parentRessource?.ressourceName, ids: [] });
+    }
+
+    public async index<T>() {
+        try {
+            const ressources = await request<T[]>({ method: 'get', url: `${this.endpoint}` });
+            return ressources.data;
+        } catch (error) {
+            const err = error as AxiosError;
+            Notify.create({
+                message: `${this.ressourceUiName} fetch failed : ${err.message}`,
+                type: 'negative'
+            });
+            throw error;
+        }
     }
 
     public async delete(id: number[]) {
@@ -62,7 +89,6 @@ export default class RestClient implements IRestClient {
             });
             throw error;
         } finally {
-
             this.unload();
         }
     }
@@ -90,6 +116,7 @@ export default class RestClient implements IRestClient {
     }
 
     public async create<T>(post: Record<string, any>) {
+
         try {
             const ressource = await request<T>({ method: 'post', url: `${this.endpoint}`, data: { [this.ressourceName]: post } });
             Notify.create({
@@ -108,7 +135,7 @@ export default class RestClient implements IRestClient {
     }
 
     private getName(post: Record<string, string>) {
-        return post.title ?? post.full_name ?? post.name ?? '';
+        return post.title ?? post.full_name ?? post.first_name ?? post.name ?? '';
     }
 
 

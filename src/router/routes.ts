@@ -7,6 +7,13 @@ const routes: RouteRecordRaw[] = [
     component: () => import('pages/EngagementTable.vue')
     // children: [{ path: '', component: () => import('pages/ReportsTable.vue') }],
   },
+  {
+    path: '/contacts',
+    name: 'contacts',
+    props: true,
+    component: () => import('pages/ContactTable.vue')
+    // children: [{ path: '', component: () => import('pages/ReportsTable.vue') }],
+  },
 
   // Always leave this as last one,
   // but you can also remove it

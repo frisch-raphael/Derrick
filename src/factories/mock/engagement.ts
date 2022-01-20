@@ -4,6 +4,7 @@ import { makeFakeCompany } from 'src/factories/mock/company';
 import { EngagementState } from 'src/enums/enums';
 import { getRandomInt } from 'src/factories/utils';
 import { DateTime } from 'luxon';
+import { makeFakeContacts } from 'src/factories/mock/contact';
 
 const languages = ['French', 'English'];
 const tests = ['Internal pentest', 'Phishing campain', 'Applicat web Contoso'];
@@ -20,7 +21,8 @@ export const makeFakeEngagement = (): IEngagement => {
         scoring: getRandomInt(1),
         state: EngagementState.Ongoing,
         language: languages[getRandomInt(languages.length)],
-        company: makeFakeCompany()
+        company: makeFakeCompany(),
+        contacts: makeFakeContacts(4)
     };
 };
 

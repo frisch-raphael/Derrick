@@ -3,6 +3,9 @@ import { DataTest, RessourceName } from 'src/enums/enums';
 import { engagementForm } from 'src/forms/engagement';
 import { RessourceFormType } from 'src/forms/types';
 import { companyForm } from './forms/company';
+import { contactForm } from './forms/contact';
+import { contactColumns, engagementColumns } from './pages/columns';
+import { Column, GenericRessource } from './types/types';
 
 export const prettyVariable = (variable: string) => {
     const noComplexChar = variable.replace(/[^a-zA-Z0-9+]+/gi, ' ');
@@ -17,6 +20,13 @@ export const FullDataTest = (dataTest: DataTest) => {
     return `[data-test='${dataTest}']`;
 };
 
+export const ressourceConfig: { [key in RessourceName]: { form: RessourceFormType<any>, api: ApiRessource, columns: Column<GenericRessource>[] } } =
+{
+    contact: { form: contactForm, api: ApiRessource.Contact, columns: contactColumns },
+    company: { form: contactForm, api: ApiRessource.Contact, columns: contactColumns },
+    engagement: { form: engagementForm, api: ApiRessource.Engagement, columns: engagementColumns },
+};
+
 export const ressourceNameToApi: { [key in RessourceName]: ApiRessource } = {
     engagement: ApiRessource.Engagement,
     contact: ApiRessource.Contact,
@@ -25,6 +35,6 @@ export const ressourceNameToApi: { [key in RessourceName]: ApiRessource } = {
 
 export const ressourceNameToForm: { [key in RessourceName]: RessourceFormType<any> } = {
     engagement: engagementForm,
-    contact: engagementForm,
+    contact: contactForm,
     company: companyForm
 };

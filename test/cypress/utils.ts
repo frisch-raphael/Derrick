@@ -1,5 +1,6 @@
 import { DataTest } from 'src/enums/enums';
 import { IEngagement } from 'src/dtos/engagement';
+import { IContact } from '../../src/dtos/contact';
 export const t = (string: string) => `[data-test=${string}]`;
 
 export const initRessourceFormWithEngagement = (engagementToType: Omit<Omit<IEngagement, 'id'>, 'state'>) => {
@@ -19,6 +20,14 @@ export const initRessourceFormWithEngagement = (engagementToType: Omit<Omit<IEng
     cy.get('span').contains(engagementToType.assessment_type).click();
     cy.get(t('form-language')).click();
     cy.get('span').contains(engagementToType.language).click();
+};
+
+export const initRessourceFormWithContact = (contactToType: Omit<IContact, 'id'>) => {
+    console.log('1111111');
+    cy.get(t('form-first_name')).type(contactToType.first_name);
+    cy.get(t('form-last_name')).type(contactToType.last_name);
+    cy.get(t('form-phone')).type(contactToType.phone);
+    cy.get(t('form-title')).type(contactToType.title);
 };
 
 export const reinitRessourceFormWithEngagement = (editedEngagement: Omit<IEngagement, 'id'>) => {
@@ -43,4 +52,19 @@ export const reinitRessourceFormWithEngagement = (editedEngagement: Omit<IEngage
     cy.get('span').contains(editedEngagement.state).click();
     cy.get(t('form-language')).click();
     cy.get('span').contains(editedEngagement.language).click();
+};
+
+export const verifyCardContainsContact = (contact: Partial<IContact>) => {
+    cy.dataCy(DataTest.RessourceTableCard).first().should('contain.text', contact.first_name);
+    cy.dataCy(DataTest.RessourceTableCard).first().should('contain.text', contact.last_name);
+    cy.dataCy(DataTest.RessourceTableCard).first().should('contain.text', contact.phone);
+    cy.dataCy(DataTest.RessourceTableCard).first().should('contain.text', contact.title);
+};
+
+export const verifyCardContainsEngagement = (engagement: Partial<IEngagement>) => {
+    cy.dataCy(DataTest.RessourceTableCard).first().should('contain.text', engagement.title);
+    cy.dataCy(DataTest.RessourceTableCard).first().should('contain.text', engagement.end_date);
+    cy.dataCy(DataTest.RessourceTableCard).first().should('contain.text', engagement.start_date);
+    cy.dataCy(DataTest.RessourceTableCard).first().should('contain.text', engagement.assessment_type);
+    cy.dataCy(DataTest.RessourceTableCard).first().should('contain.text', engagement.language);
 };

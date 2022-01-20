@@ -1,5 +1,6 @@
 import { IEngagement } from 'src/dtos/engagement';
 import { Column } from 'src/types/types';
+import { IContact } from 'src/dtos/contact';
 
 type EngagementColumn = { name: keyof IEngagement } & Column<IEngagement>
 
@@ -16,3 +17,18 @@ export const engagementColumns: EngagementColumn[] = [
     }, {
         name: 'language', field: 'language', label: 'Language', required: true
     }];
+
+type ContactColumn = { name: keyof IContact } & Column<IContact>
+
+export const contactColumns: ContactColumn[] = [
+    {
+        name: 'first_name', field: 'first_name', label: 'First Name', required: true
+    },
+    {
+        name: 'last_name', field: 'last_name', label: 'Last name', required: true
+    }, {
+        name: 'phone', field: 'phone', label: 'Phone'
+    }, {
+        name: 'title', field: 'title', label: 'Title'
+    },
+];

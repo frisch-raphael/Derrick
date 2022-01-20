@@ -1,38 +1,35 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import { useStore } from 'src/store';
-import { HeaderAction, Row } from 'src/types/types';
+import { Row, ParentRessource } from 'src/types/types';
 import { MutationType } from 'src/store/columbo/mutations-types';
 import { RessourceName, DataTest } from 'src/enums/enums';
 import { capitalizeFirstLetter } from 'src/utils';
+import { RessourceActions } from 'src/ui/BaseTable/ressourceActions';
 const store = useStore();
 const emit = defineEmits(['all-selected']);
 
 const props = defineProps<{
   ressourceName: RessourceName;
-  actions: HeaderAction[];
   selected: Row[];
+  parentRessource?: ParentRessource;
 }>();
+const ressourceActions = new RessourceActions(props.ressourceName, store, props.parentRessource);
 
 const menuState = computed({
   get(): boolean {
-    return !!store.state.columbo.isHeaderOpenFor?.engagement;
+    return !!store.state.columbo.isHeaderOpenFor[props.ressourceName];
   },
   set(newState: boolean): void {
     store.commit(MutationType.updateRessourceMenu, {
-      ressource: props.ressourceName,
+      ressourceName: props.ressourceName,
       isOpen: newState,
     });
   },
 });
 
-const launchAction = (headerAction: HeaderAction) => {
-  if (headerAction.params === 'none') headerAction.function();
-  else if (headerAction.params === 'ids') headerAction.function(props.selected.map((r) => r.id));
-};
-const isDisabled = (headerAction: HeaderAction): boolean => {
-  if (headerAction.params === 'ids') return !props.selected.map((r) => r.id).length;
-  else return false;
+const isDisabled = (): boolean => {
+  return !props.selected.map((r) => r.id).length;
 };
 const selectAll = ref(false);
 </script>
@@ -54,14 +51,21 @@ const selectAll = ref(false);
     <q-menu v-model="menuState">
       <q-list>
         <q-item
-          v-for="action in actions"
-          :key="action.name"
-          :clickable="!isDisabled(action)"
-          :disable="isDisabled(action)"
-          :data-cy="action.datatest"
-          @click="launchAction(action)"
+          :data-cy="DataTest.RessourceTableHeaderCreateNew"
+          icon="mdi-plus"
+          clickable
+          @click="ressourceActions.openCreateDialog()"
         >
-          <q-item-section>{{ action.name }}</q-item-section>
+          <q-item-section>{{ 'Create new ' + props.ressourceName }}</q-item-section>
+        </q-item>
+        <q-item
+          :clickable="!isDisabled()"
+          :disable="isDisabled()"
+          icon="mdi-delete"
+          :data-cy="DataTest.RessourceTableHeaderDeleteAll"
+          @click="ressourceActions.deleteRowsInTableAndBackend(props.selected.map((r) => r.id))"
+        >
+          <q-item-section>{{ 'Delete selected' }}</q-item-section>
         </q-item>
       </q-list>
     </q-menu>

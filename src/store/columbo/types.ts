@@ -1,10 +1,12 @@
 import { RessourceName } from 'src/enums/enums';
 import { Row } from 'src/types/types';
 import { CreateEditDialogState } from './state';
+import { ParentRessource } from '../../types/types';
 
-export type OpenStateUpdate = { ressource: RessourceName, isOpen: boolean }
-export type CreateEditRessourceStateUpdate = { ressource: RessourceName } & CreateEditDialogState
-export type RessourceTableUpdate = { ressource: RessourceName, rows: Row[] }
-export type RessourceTableCreateEdit = { ressource: RessourceName, row: Row }
-export type RessourceTableDelete = { ressource: RessourceName, ids: number[] }
-export type RessourceTableLoading = { ressource: RessourceName, ids: number[] } 
+export type OpenStateUpdate = { ressourceName: RessourceName, isOpen: boolean }
+export type CreateEditRessourceStateUpdate = { ressourceName: RessourceName } & CreateEditDialogState
+export type RessourceTableUpdate = { ressourceName: RessourceName, rows: Row[] }
+export type RessourceTableCreateEdit = { ressourceName: RessourceName, row: Row }
+export type RessourceTableDelete = { ressourceName: RessourceName, ids: number[] }
+export type RessourceTableChildDelete = { ressourceName: RessourceName, parentRessource: ParentRessource, ids: number[] }
+export type RessourceTableLoading = { ressourceName: RessourceName, ids: number[] } 

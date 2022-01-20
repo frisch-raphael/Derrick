@@ -1,4 +1,7 @@
+import { ICompany } from 'src/dtos/company';
 import { RessourceName } from 'src/enums/enums';
+import { IEngagement } from '../dtos/engagement';
+import { IContact } from '../dtos/contact';
 
 export type Context = 'administration' | 'engagement'
 
@@ -142,6 +145,7 @@ type FunctionlessHeaderAction = {
 }
 
 export type GenericRessource = Record<string, any> & { id: number }
+export type Ressource = IEngagement | ICompany | IContact
 
 type FunctionCardAction = {
     function: (id: number) => void,
@@ -161,9 +165,13 @@ type FunctionHeaderdAction = {
     function: (ids: number[]) => void,
     params: 'ids'
 }
-
-
-export type ParentRessource = { ressource: RessourceName, id?: number }
+// param: ParentRessource will get the ressource added to param.
+// i.e if param = "contacts", contact will be added to "contacts"
+export type ParentRessource<T = GenericRessource> = {
+    ressourceName: RessourceName,
+    ressource?: GenericRessource,
+    param?: keyof T,
+}
 export type CardAction = (FunctionCardAction) & FunctionlessCardAction
 export type HeaderAction = (FunctionHeaderdAction) & FunctionlessHeaderAction
 export type Row = { id: number, [x: string]: any }

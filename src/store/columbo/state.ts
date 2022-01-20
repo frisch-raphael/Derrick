@@ -1,10 +1,17 @@
 import { RessourceName } from 'src/enums/enums';
 import { Row } from 'src/types/types';
 import { GenericRessource } from 'src/types/types';
+import { ParentRessource } from '../../types/types';
 
 
 export type OpenedStatus = { [key in RessourceName]?: boolean }
-export type CreateEditDialogState = { isOpen: boolean, mode: 'edit' | 'create', ressourceToEdit: GenericRessource }
+export type CreateEditDialogState = {
+  isOpen?: boolean,
+  mode?: 'edit' | 'create',
+  ressourceToEdit?: GenericRessource,
+  isParentStoreTarget?: boolean,
+  parentRessource?: ParentRessource
+}
 export type CreateEditDialogStatus = { [key in RessourceName]?: CreateEditDialogState }
 export type RessourceTableRows = { [key in RessourceName]?: Row[] }
 export type RessourceTableLoading = { [key in RessourceName]?: number[] }

@@ -7,7 +7,7 @@ import { Row } from 'src/types/types';
 export type Getters = {
   menuHeaderOpenedStatus: (state: ColumboState) => (ressource: RessourceName) => boolean,
   createEditRessourceStatus: (state: ColumboState) => (ressource: RessourceName) => CreateEditDialogState,
-  RessourceTableRows: (state: ColumboState) => (ressource: RessourceName) => Row[],
+  RessourceTableRows: (state: ColumboState) => <T = Row[]>(ressource: RessourceName) => T[] | undefined,
   isRessourceLoading: (state: ColumboState) => (ressource: RessourceName, id: number) => boolean,
 }
 
@@ -22,10 +22,10 @@ const getters: GetterTree<ColumboState, State> & Getters = {
     }
     return createEditStatus;
   },
-  RessourceTableRows: (state) => (ressource): Row[] => {
-    return state.ressourceTableRows[ressource] ?? [];
+  RessourceTableRows: (state) => <T = Row[]>(ressource: RessourceName) => {
+    return state.ressourceTableRows[ressource] as T[] | undefined;
   },
-  isRessourceLoading: (state) => (ressource, id: number): boolean => {
+  isRessourceLoading: (state) => (ressource, id) => {
     return !!state.ressourceTableLoading[ressource]?.includes(id);
   },
 

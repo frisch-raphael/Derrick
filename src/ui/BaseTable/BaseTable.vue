@@ -4,40 +4,37 @@ import SearchInput from 'src/ui/SearchInput.vue';
 import BaseTableCard from './BaseTableCard/BaseTableCard.vue';
 import BaseTableHeaderMenu from 'src/ui/BaseTable/BaseTableHeaderMenu/BaseTableHeaderMenu.vue';
 import CreateEditRessourceDialog from 'src/ui/BaseTable/CreateEditRessourceDialog.vue';
-import { RessourceActions } from 'src/ui/BaseTable/ressourceActions';
-import { Columns, HeaderAction, Row, TableItem } from 'src/types/types';
+import { Columns, ParentRessource, Row, TableItem } from 'src/types/types';
 import { RessourceName, DataTest } from 'src/enums/enums';
 import { useStore } from 'src/store';
-import { LooseDictionary } from '../../types/types';
+import { LooseDictionary } from 'src/types/types';
 
 const store = useStore();
 
 interface Props {
   ressourceName: RessourceName;
+  parentRessource?: ParentRessource;
   grid: boolean;
   columns: Columns<any>;
-  headerActions?: HeaderAction[];
 }
 
 const props = withDefaults(defineProps<Props>(), {
   headerActions: () => [],
   grid: true,
+  parentRessource: undefined,
 });
 
-const ressourceActions = new RessourceActions(props.ressourceName, store);
-const { defaultHeaderActions } = ressourceActions.getDefaultActions();
 const isLoading = ref(false);
 
 const filter = ref(''); //TODO link to SearchInput
 const selected: Ref<Row[]> = ref([]);
-const allHeaderActions = props.headerActions.concat(defaultHeaderActions);
 
 const updateFilter = (new_filter: string) => {
   filter.value = new_filter;
 };
 
 const selectAllClicked = (checked: boolean) => {
-  selected.value = checked ? store.getters.RessourceTableRows(RessourceName.Engagement) : [];
+  selected.value = checked ? store.getters.RessourceTableRows(props.ressourceName) ?? [] : [];
 };
 
 const typeSlotProps = (slotProps: LooseDictionary) => {
@@ -70,14 +67,18 @@ const typeSlotProps = (slotProps: LooseDictionary) => {
       <template #top-left>
         <base-table-header-menu
           :selected="selected"
+          :parent-ressource="parentRessource"
           :ressource-name="ressourceName"
-          :actions="allHeaderActions"
           @all-selected="selectAllClicked"
         ></base-table-header-menu>
       </template>
 
       <template v-if="grid" #item="slotProps">
-        <base-table-card :ressource-name="ressourceName" :table-item="typeSlotProps(slotProps)">
+        <base-table-card
+          :ressource-name="ressourceName"
+          :parent-ressource="parentRessource"
+          :table-item="typeSlotProps(slotProps)"
+        >
           <template #bottom-actions="{ row }">
             <slot name="card-bottom-actions" :row="row"></slot>
           </template>
@@ -86,7 +87,7 @@ const typeSlotProps = (slotProps: LooseDictionary) => {
     </q-table>
 
     <q-markup-table
-      v-if="store.getters.RessourceTableRows(ressourceName).length === 0"
+      v-if="store.getters.RessourceTableRows(ressourceName)?.length === 0"
       :data-cy="DataTest.RessourceFormNoData"
     >
       <q-banner>

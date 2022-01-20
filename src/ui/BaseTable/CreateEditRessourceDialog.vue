@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref, Ref, computed } from 'vue';
+import { computed, reactive } from 'vue';
 import { RessourceName } from 'src/enums/enums';
 import { useStore } from 'src/store';
 import { MutationType } from 'src/store/columbo/mutations-types';
@@ -7,21 +7,20 @@ import RestClient from 'src/classes/api/restClient';
 import { capitalizeFirstLetter, ressourceNameToForm } from 'src/utils';
 import BaseDialog from 'src/ui/BaseDialog.vue';
 import RessourceForm from 'src/components/RessourceForm.vue';
-import { AxiosError } from 'axios';
 import { CreateEditDialogState } from 'src/store/columbo/state';
-import { GenericRessource, ParentRessource } from 'src/types/types';
+import { GenericRessource } from 'src/types/types';
+import { AxiosError } from 'axios';
 import { Notify } from 'quasar';
 
 const store = useStore();
 
 const props = defineProps<{
   ressourceName: RessourceName;
-  parentRessource?: ParentRessource;
 }>();
 const emits = defineEmits(['loading-changed']);
 
-const defaultState: CreateEditDialogState = { mode: 'create', isOpen: false, ressourceToEdit: { id: 0 } };
-const state = computed(
+const defaultState: CreateEditDialogState = { mode: 'create', isOpen: false };
+const storeState = computed(
   () => store.state.columbo.createEditRessourceStatus[props.ressourceName] || defaultState
 );
 let createEditDialogState = computed({
@@ -30,75 +29,107 @@ let createEditDialogState = computed({
   },
   set(newState: boolean): void {
     store.commit(MutationType.updateCreateEditRessourceState, {
-      ressource: props.ressourceName,
+      ressourceName: props.ressourceName,
       isOpen: newState,
-      mode: state.value.mode,
-      ressourceToEdit: state.value.ressourceToEdit,
+      mode: storeState.value.mode,
+      ressourceToEdit: storeState.value.ressourceToEdit,
+      parentRessource: storeState.value.parentRessource,
+      isParentStoreTarget: storeState.value.isParentStoreTarget,
     });
   },
 });
-const newCreateEditRessource: Ref<Partial<GenericRessource>> = ref({ title: '' });
+const localState = reactive({ newCreateEditRessource: {} });
 
 const updateRessourceToCreate = (ressource: GenericRessource) =>
-  (newCreateEditRessource.value = { ...ressource });
+  (localState.newCreateEditRessource = { ...ressource });
 
-const reinit = () => {
+const closeRessourceTableHeader = () => {
   store.commit(MutationType.updateRessourceMenu, {
-    ressource: props.ressourceName,
+    ressourceName: props.ressourceName,
     isOpen: false,
   });
+};
+const reinit = () => {
+  closeRessourceTableHeader();
   createEditDialogState.value = false;
-  newCreateEditRessource.value = { title: '' };
+  localState.newCreateEditRessource = {};
+  store.commit(MutationType.updateCreateEditRessourceState, {
+    ressourceName: props.ressourceName,
+    ressourceToEdit: undefined,
+    parentRessource: undefined,
+    mode: undefined,
+  });
 };
 
 const title = computed(() => {
-  if (props.parentRessource?.id) return `${capitalizeFirstLetter(props.ressourceName)}`;
-  return state.value.mode === 'create' ? `create new ${props.ressourceName}` : `edit ${props.ressourceName}`;
+  if (storeState.value.parentRessource?.ressource) return `${capitalizeFirstLetter(props.ressourceName)}`;
+  return storeState.value.mode === 'create'
+    ? `create new ${props.ressourceName}`
+    : `edit ${props.ressourceName}`;
 });
 
 const createEditRessource = async () => {
   const mode = store.getters.createEditRessourceStatus(props.ressourceName).mode;
   let client: RestClient;
-  client = props.parentRessource?.id
-    ? new RestClient(props.ressourceName, props.parentRessource)
+  client = storeState.value.parentRessource
+    ? new RestClient(props.ressourceName, storeState.value.parentRessource)
     : new RestClient(props.ressourceName);
   createEditDialogState.value = false;
   let ressourceFromBackend: GenericRessource;
   if (mode === 'create') {
     emits('loading-changed');
-    ressourceFromBackend = await client.create<GenericRessource>(newCreateEditRessource.value);
-    emits('loading-changed');
+    try {
+      ressourceFromBackend = await client.create<GenericRessource>(localState.newCreateEditRessource);
+    } catch (error) {
+      const err = error as AxiosError;
+      Notify.create({ message: err.message, type: 'negative' });
+      return;
+    } finally {
+      emits('loading-changed');
+    }
   } else {
+    if (!storeState.value.ressourceToEdit) throw Error('Editing ressource but none found');
     ressourceFromBackend = await client.update<GenericRessource>(
-      state.value.ressourceToEdit.id,
-      newCreateEditRessource.value
+      storeState.value.ressourceToEdit.id,
+      localState.newCreateEditRessource
     );
   }
-  reinit();
+  let newRow: GenericRessource;
+  let ressourceToUpdate = props.ressourceName;
+  if (storeState.value.isParentStoreTarget) {
+    if (!storeState.value.parentRessource?.ressource) throw Error('No parent ressource');
+    ressourceToUpdate = storeState.value.parentRessource?.ressourceName;
+    newRow = { ...storeState.value.parentRessource.ressource };
+    const ressourceParam = storeState.value.parentRessource.param ?? props.ressourceName;
+    // if (newRow[ressourceParam] instanceof Array)
+    //   (newRow[ressourceParam] as Array<GenericRessource>).push(ressourceFromBackend);
+    // else newRow[ressourceParam] = ressourceFromBackend;
+    newRow[ressourceParam] = ressourceFromBackend;
+  } else {
+    newRow = ressourceFromBackend;
+  }
 
   store.commit(MutationType.createEditOneRessourceTableRow, {
-    ressource: props.ressourceName,
-    row: ressourceFromBackend,
+    ressourceName: ressourceToUpdate,
+    row: newRow,
   });
+  reinit();
 };
 
 const tryToCreateEditRessource = async () => {
   try {
     await createEditRessource();
-  } catch (err) {
-    const error = err as AxiosError;
-    Notify.create({
-      message: `could not ${state.value.mode} ${props.ressourceName}: ${error.message}`,
-      type: 'negative',
-    });
+  } catch (error) {
+    const err = error as AxiosError;
+    console.error('Could not udpate ressource : ' + err.message);
   }
 };
 </script>
 
 <template>
-  <base-dialog v-model="createEditDialogState" :title="title" @before-hide="reinit()">
+  <base-dialog v-model="createEditDialogState" :title="title" @before-hide="closeRessourceTableHeader()">
     <ressource-form
-      :ressource="state.mode === 'edit' ? state.ressourceToEdit : undefined"
+      :ressource="storeState.mode === 'edit' ? storeState.ressourceToEdit : undefined"
       :ressource-form-config="ressourceNameToForm[props.ressourceName]"
       @submit="tryToCreateEditRessource"
       @ressource-form-update="updateRessourceToCreate"
