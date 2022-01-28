@@ -1,9 +1,11 @@
 import { defineStore } from 'pinia';
 import { RessourceName } from 'src/enums/enums';
 import { GenericRessource, ParentRessource, Row } from 'src/types/types';
+import { useLocalStorage } from '@vueuse/core';
+
 
 type OpenedStatus = { [key in RessourceName]?: boolean }
-type CreateEditDialogState = {
+export type CreateEditDialogState = {
     isOpen?: boolean,
     mode?: 'edit' | 'create',
     ressourceToEdit?: GenericRessource,
@@ -17,21 +19,20 @@ type RessourceTableLoading = { [key in RessourceName]?: number[] }
 
 export type CreateEditRessourceStateUpdate = { ressourceName: RessourceName } & CreateEditDialogState
 
-export const useStore = defineStore('main', {
+export const useUiStore = defineStore('Ui', {
     state: () => ({
-        isHeaderOpenFor: {} as OpenedStatus,
-        createEditRessourceStatus: {} as CreateEditDialogStatus,
-        ressourceTableRows: {} as RessourceTableRows,
-        ressourceTableLoading: {} as RessourceTableLoading,
+        isHeaderOpenFor: useLocalStorage('isHeaderOpenFor', {}) as OpenedStatus,
+        createEditRessourceStatus: useLocalStorage('createEditRessourceStatus', {}) as CreateEditDialogStatus,
+        ressourceTableRows: useLocalStorage('ressourceTableRows', {}) as RessourceTableRows,
+        ressourceTableLoading: useLocalStorage('ressourceTableLoading', {}) as RessourceTableLoading,
     }),
     actions: {
         updateCreateEditRessourceState(update: CreateEditRessourceStateUpdate) {
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            const { ressourceName, ...updateWithoutRessourceName } = update;
             this.createEditRessourceStatus[update.ressourceName] = {
-                isOpen: update.isOpen,
-                mode: update.mode,
-                ressourceToEdit: update.ressourceToEdit,
-                isParentStoreTarget: update.isParentStoreTarget,
-                parentRessource: update.parentRessource
+                ...this.createEditRessourceStatus[update.ressourceName],
+                ...updateWithoutRessourceName
             };
         },
         reinitCreateEditRessourceState(ressourceName: RessourceName) {

@@ -1,0 +1,1 @@
+export const phone = [(val: string) => /^[0-9\(\)x\s+.-]+$/.test(val) || 'Invalid phone number'];

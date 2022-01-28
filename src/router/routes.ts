@@ -8,7 +8,7 @@ const routes: RouteRecordRaw[] = [
     // children: [{ path: '', component: () => import('pages/ReportsTable.vue') }],
   },
   {
-    path: '/contacts',
+    path: '/engagement/:parentEngagementId/contacts',
     name: 'contacts',
     props: true,
     component: () => import('pages/ContactTable.vue')

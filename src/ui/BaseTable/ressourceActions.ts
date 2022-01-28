@@ -4,11 +4,11 @@ import { AxiosError } from 'axios';
 import RestClient from 'src/classes/api/restClient';
 import { GenericRessource } from 'src/types/types';
 import { ParentRessource } from '../../types/types';
-import { useStore } from '../../stores/index';
+import { useUiStore } from '../../stores/ui';
 
 export class RessourceActions {
     private restClient: IRestClient
-    private store = useStore()
+    private store = useUiStore()
 
     constructor(
         private ressourceName: RessourceName,

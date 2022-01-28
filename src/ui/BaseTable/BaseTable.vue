@@ -7,20 +7,22 @@ import CreateEditRessourceDialog from 'src/ui/BaseTable/CreateEditRessourceDialo
 import { Columns, ParentRessource, Row, TableItem } from 'src/types/types';
 import { RessourceName, DataTest } from 'src/enums/enums';
 import { LooseDictionary } from 'src/types/types';
-import { useStore } from 'src/stores';
+import { useUiStore } from 'src/stores/ui';
 
-const store = useStore();
+const store = useUiStore();
 
 interface Props {
   ressourceName: RessourceName;
   parentRessource?: ParentRessource;
   grid: boolean;
+  title?: string;
   columns: Columns<any>;
 }
 
 const props = withDefaults(defineProps<Props>(), {
   headerActions: () => [],
   grid: true,
+  title: '',
   parentRessource: undefined,
 });
 
@@ -66,7 +68,9 @@ const typeSlotProps = (slotProps: LooseDictionary) => {
 
       <template #top-left>
         <base-table-header-menu
+          :title="props.title"
           :selected="selected"
+          :data-cy="DataTest.RessourceTableHeader"
           :parent-ressource="parentRessource"
           :ressource-name="ressourceName"
           @all-selected="selectAllClicked"

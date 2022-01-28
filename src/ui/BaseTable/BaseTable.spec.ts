@@ -1,21 +1,23 @@
 import { mount } from '@cypress/vue';
 import BaseTable from 'src/ui/BaseTable/BaseTable.vue';
 import { DataTest, RessourceName } from 'src/enums/enums';
-
-import { storeKey } from 'src/store';
-import store from 'src/store/index';
-import { MutationType } from 'src/store/columbo/mutations-types';
 import { makeFakeEngagements, makeFakeEngagement } from 'src/factories/mock/engagement';
 import { Dialog, Notify } from 'quasar';
 import { installQuasarPlugin } from '@quasar/quasar-app-extension-testing-e2e-cypress';
 import { initRessourceFormWithEngagement, verifyCardContainsContact, verifyCardContainsEngagement } from '../../../test/cypress/utils';
-import { ressourceConfig } from 'src/utils';
+import { ressourceConfig } from 'src/utils/utils';
 import { ParentRessource } from 'src/types/types';
 import { makeFakeContacts } from 'src/factories/mock/contact';
 import { makeFakeContact } from 'src/factories/mock/contact';
 import { initRessourceFormWithContact } from '../../../test/cypress/utils';
-import { IContact } from '../../dtos/contact';
+import { IContact } from 'src/dtos/contact';
 import { IEngagement } from 'src/dtos/engagement';
+import { createTestingPinia } from '@pinia/testing';
+import { useUiStore } from 'src/stores/ui';
+import { useConfigStore } from 'src/stores/config';
+import { capitalizeFirstLetter } from 'src/utils/utils';
+import { ApiRessource } from 'src/enums/enums';
+import { makeFakeConfig } from 'src/factories/mock/config';
 
 installQuasarPlugin({ plugins: { Dialog, Notify } });
 
@@ -46,22 +48,14 @@ for (const ressourceConfig of Object.values(ressourceConfigWithFakes)) {
 
     describe('The BaseTable mounted with' + ressourceConfig.name, () => {
 
-        beforeEach(() => {
-            store.commit(MutationType.updateCreateEditRessourceState,
-                {
-                    ressourceName: ressourceConfig.name,
-                    isOpen: false,
-                    mode: 'create',
-                });
-            store.commit(MutationType.updateRessourceTable,
-                {
-                    ressourceName: ressourceConfig.name,
-                    rows: ressourceConfig.fakes
-                });
+        beforeEach(async () => {
+
             mount(BaseTable,
                 {
                     global: {
-                        provide: { [(storeKey as any)]: store }
+                        plugins: [createTestingPinia({
+                            createSpy: (action: any) => cy.spy(action), stubActions: false
+                        })]
                     },
                     props: {
                         grid: true,
@@ -70,7 +64,31 @@ for (const ressourceConfig of Object.values(ressourceConfigWithFakes)) {
                         parentRessource: ressourceConfig.parentRessource
                     }
                 }).as('wrapper');
+            const store = useUiStore();
+
+            cy.intercept('get', ApiRessource.Config, makeFakeConfig()).as('emptyContacts');
+            const confStore = useConfigStore();
+            await confStore.updateConfigTranslationEntries();
+
+
+            store.updateCreateEditRessourceState(
+                {
+                    ressourceName: ressourceConfig.name,
+                    isOpen: false,
+                    mode: 'create',
+                });
+            store.updateRessourceTable(ressourceConfig.name, ressourceConfig.fakes);
             Notify.setDefaults({ timeout: 200 });
+
+        });
+
+        it('has correct title', () => {
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+            cy.dataCy(DataTest.RessourceTableHeader).should('exist');
+            cy.dataCy(DataTest.RessourceTableHeader).should('contain.text', capitalizeFirstLetter(ressourceConfig.name));
+            const title = 'Base table title';
+            cy.get('@wrapper').invoke('setProps', { title: title });
+            cy.dataCy(DataTest.RessourceTableHeader).should('contain.html', title);
 
         });
 
@@ -188,7 +206,8 @@ for (const ressourceConfig of Object.values(ressourceConfigWithFakes)) {
         });
 
         it('display "no data" warning when no rows, but no loading bar', () => {
-            store.commit(MutationType.updateRessourceTable, { ressourceName: ressourceConfig.name, rows: [] });
+            const store = useUiStore();
+            store.updateRessourceTable(ressourceConfig.name, []);
             cy.dataCy('no-data').should('exist');
             cy.dataCy(DataTest.RessourceTableLoading).should('have.attr', 'aria-valuenow');
         });

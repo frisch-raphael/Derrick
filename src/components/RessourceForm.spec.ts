@@ -2,10 +2,12 @@ import { mount } from '@cypress/vue';
 import RessourceForm from 'src/components/RessourceForm.vue';
 import { engagementForm } from 'src/forms/engagement';
 import { DataTest } from '../enums/enums';
-import { FullDataTest, prettyVariable } from '../utils';
+import { FullDataTest, prettyVariable } from '../utils/utils';
 import { makeFakeEngagement } from '../factories/mock/engagement';
 import { installQuasarPlugin } from '@quasar/quasar-app-extension-testing-e2e-cypress';
 import { Dialog, Notify } from 'quasar';
+import { createTestingPinia } from '@pinia/testing';
+import { useConfigStore } from 'src/stores/config';
 installQuasarPlugin({ plugins: { Dialog, Notify } });
 
 
@@ -15,11 +17,18 @@ describe('The RessourceForm', () => {
     const { id, ...fakeEngagement } = makeFakeEngagement();
     beforeEach(() => {
         mount(RessourceForm, {
+            global: {
+                plugins: [createTestingPinia({
+                    createSpy: (action: any) => cy.spy(action), stubActions: false
+                })]
+            },
             props: {
-                ressourceFormConfig: engagementForm,
+                ressourceFormConfig: engagementForm(useConfigStore()),
                 ressource: fakeEngagement
             }
         });
+        ;
+
     });
 
 

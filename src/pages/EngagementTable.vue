@@ -1,6 +1,6 @@
 <script setup lang="ts">
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-import { onMounted, computed } from 'vue';
+import { onMounted, computed, ref } from 'vue';
 import { IEngagement } from 'src/dtos/engagement';
 import request from 'src/axios';
 import BaseTable from 'src/ui/BaseTable/BaseTable.vue';
@@ -8,24 +8,38 @@ import { RessourceName, DataTest } from 'src/enums/enums';
 import { engagementColumns } from 'src/pages/columns';
 import CreateEditRessourceDialog from '../ui/BaseTable/CreateEditRessourceDialog.vue';
 import { GenericRessource } from 'src/types/types';
+import { useUiStore } from 'src/stores/ui';
+import { useConfigStore } from 'src/stores/config';
 import { useRouter } from 'vue-router';
-import { useStore } from 'src/stores';
 
-const store = useStore();
+const uiStore = useUiStore();
+const configStore = useConfigStore();
 const router = useRouter();
+const isLoading = ref(true);
 
 // const engagements: Ref<IEngagement[] | undefined> = ref(undefined);
 // TODO dans l'api
 onMounted(async () => {
-  const response = await request<IEngagement[]>({ method: 'get', url: '/engagements' });
-  store.updateRessourceTable(RessourceName.Engagement, response.data || []);
+  const engagementPromise = request<IEngagement[]>({ method: 'get', url: '/engagements' });
+  const configPromise = configStore.updateConfigTranslationEntries();
+  const promises = await Promise.all([engagementPromise, configPromise]);
+  const engagements = promises[0];
+  uiStore.updateRessourceTable(RessourceName.Engagement, engagements.data || []);
+  isLoading.value = false;
 });
 
-const engagements = computed(() => store.ressourceTableRows.engagement as IEngagement[]);
+const engagements = computed(() => uiStore.ressourceTableRows.engagement as IEngagement[]);
 
+const goToContact = async (engagement: IEngagement) => {
+  await router.push({
+    name: 'contacts',
+    params: { parentEngagementId: engagement.id },
+    query: { engagement: engagement.title },
+  });
+};
 const companyClicked = (ressource: GenericRessource) => {
   const company = engagements.value?.find((e) => e.id === ressource.id)?.company;
-  store.updateCreateEditRessourceState({
+  uiStore.updateCreateEditRessourceState({
     isOpen: true,
     mode: company ? 'edit' : 'create',
     ressourceName: RessourceName.Company,
@@ -41,7 +55,7 @@ const companyClicked = (ressource: GenericRessource) => {
 
 <template>
   <q-linear-progress
-    v-if="engagements === undefined"
+    v-if="isLoading"
     indeterminate
     :data-cy="DataTest.EngagementTableLoading"
   ></q-linear-progress>
@@ -61,7 +75,8 @@ const companyClicked = (ressource: GenericRessource) => {
         color="blue"
         rounded
         icon="mdi-account-multiple"
-        @click="router.push({ name: 'contacts', params: { parentEngagementId: engagementRow.id } })"
+        :data-cy="DataTest.EngagementTableContactBtn"
+        @click="goToContact(engagementRow as IEngagement)"
         ><q-tooltip>Contacts</q-tooltip></q-btn
       >
     </template>

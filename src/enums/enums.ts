@@ -12,13 +12,15 @@ export enum EngagementState {
 export enum RessourceName {
     Engagement = 'engagement',
     Contact = 'contact',
-    Company = 'company'
+    Company = 'company',
+    ColumboConfig = 'config',
 }
 
 export enum ApiRessource {
     Engagement = '/engagements',
     Contact = '/contacts',
-    Company = '/companies'
+    Company = '/companies',
+    Config = '/config'
 }
 
 
@@ -37,9 +39,12 @@ export enum DataTest {
     RessourceForm = 'ressource-form',
     RessourceFormNoData = 'no-data',
     RessourceFormCreateEditBtn = 'engagement-create-edit-btn',
+    RessourceTable = 'ressource-table',
     RessourceTableSearchInput = 'ressource-table-search-input',
     RessourceTableSelectAll = 'ressource-table-select-all',
     RessourceTableOpenHeaderMenuBtn = 'open-menu-btn',
+    RessourceTableHeader = 'ressource-table-header',
+    RessourceTableHeaderTitle = 'ressource-table-header-title',
     RessourceTableHeaderDeleteAll = 'ressource-table-header-delete-all',
     RessourceTableHeaderCreateNew = 'ressource-table-header-create-new',
     RessourceTableLoading = 'base-table-loading',
@@ -52,8 +57,8 @@ export enum DataTest {
     ContactTable = 'contact-table',
     ContactTableLoading = 'contact-table-loading',
     EngagementTableLoading = 'engagement-table-loading',
+    EngagementTableContactBtn = 'engagement-table-contact-btn',
     EngagementTableCompanyBtn = 'engagement-table-company-btn',
-    EngagementTableContactsBtn = 'engagement-table-contacts-btn',
     EngagementFormStartDate = 'form-start_date',
     EngagementFormAssessmentType = 'form-assessment_type',
     EngagementFormTitle = 'form-title',

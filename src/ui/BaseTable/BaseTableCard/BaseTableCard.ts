@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-return */
 /* eslint-disable @typescript-eslint/no-unsafe-call */
 import { defineComponent, PropType } from 'vue';
-import { TableItem, CardAction } from 'src/types/types';
+import { TableItem } from 'src/types/types';
 import { LooseDictionary } from 'src/types/types';
 import { GenericRessource } from '../../../types/types';
 
@@ -12,19 +12,7 @@ export default defineComponent({
             required: true,
             type: Object as () => TableItem
         },
-        actions: {
-            type: Array as PropType<CardAction[]>,
-            required: false,
-            default: (): CardAction[] => [],
-        }
-    },
-    data() {
-        const launchAction = (action: CardAction, row: GenericRessource) => {
-            action.isRessourcePayloadNeed || action.function(row.id);
-            action.isRessourcePayloadNeed && action.function(row.id, row);
 
-        };
-        return { launchAction };
     },
     methods: {
         getFilteredcols: (cols: LooseDictionary) =>

@@ -5,10 +5,9 @@ import { mount } from '@vue/test-utils';
 import BaseTable from 'src/ui/BaseTable/BaseTable.vue';
 import RestClient from 'src/classes/api/restClient';
 import { ApiRessource, RessourceName } from 'src/enums/enums';
-import { storeKey } from 'src/store';
-import store from 'src/store/index';
-import { MutationType } from 'src/store/columbo/mutations-types';
-import { DataTest } from '../../../../../src/enums/enums';
+import { DataTest } from 'src/enums/enums';
+import { createTestingPinia } from '@pinia/testing';
+import { useUiStore } from 'src/stores/ui';
 jest.mock('src/classes/api/restClient');
 const mockedRestClient = <jest.Mock<RestClient>>RestClient;
 // const mockedRestClient = mocked(RestClient, true)
@@ -48,7 +47,7 @@ const restClient = new mockedRestClient(ApiRessource.Engagement);
 const wrapper = mount(BaseTable,
   {
     global: {
-      provide: { [(storeKey as any)]: store }
+      plugins: [createTestingPinia({ stubActions: false })]
     },
     props: {
       columns: columns,
@@ -58,11 +57,12 @@ const wrapper = mount(BaseTable,
   } as any);
 
 describe('a BaseTable', () => {
+
   beforeEach(() => {
-    store.commit(MutationType.updateRessourceTable, { ressourceName: RessourceName.Engagement, rows: rows });
+    const store = useUiStore();
+    store.updateRessourceTable(RessourceName.Engagement, rows);
     // Clear all instances and calls to constructor and all methods:
     mockedRestClient.mockClear();
-
   });
 
 
@@ -81,11 +81,13 @@ describe('a BaseTable', () => {
 
 
   it('has functional remove button', async () => {
+    const store = useUiStore();
+
     const rowNumber = rows.length;
     const removeButton = wrapper.find("[data-cy='" + DataTest.RessourceTableCardDeleteBtn + "']");
     await removeButton.trigger('click');
     // eslint-disable-next-line @typescript-eslint/unbound-method
-    expect(store.getters.RessourceTableRows(RessourceName.Engagement).length).toBe(rowNumber - 1);
+    expect(store.ressourceTableRows?.engagement?.length).toBe(rowNumber - 1);
   });
 
 });

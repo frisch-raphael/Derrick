@@ -2,7 +2,7 @@
 import { reactive } from 'vue';
 const props = defineProps<{
   icon: string;
-  value: string;
+  value?: string;
 }>();
 
 const state = reactive({ model: props.value });

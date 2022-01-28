@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { RessourceFormGeneric } from 'src/forms/types';
-import { prettyVariable } from 'src/utils';
+import { prettyVariable } from 'src/utils/utils';
 import { DataTest } from 'src/enums/enums';
 import { toRefs } from 'vue';
 import { GenericRessource } from 'src/types/types';

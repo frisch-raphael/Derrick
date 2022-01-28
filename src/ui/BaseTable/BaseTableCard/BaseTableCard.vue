@@ -6,9 +6,9 @@ import { TableItem, ParentRessource } from 'src/types/types';
 import { LooseDictionary } from 'src/types/types';
 import { DataTest, RessourceName } from 'src/enums/enums';
 import { RessourceActions } from 'src/ui/BaseTable/ressourceActions';
-import { capitalizeFirstLetter } from 'src/utils';
-import { useStore } from 'src/stores';
-const store = useStore();
+import { capitalizeFirstLetter } from 'src/utils/utils';
+import { useUiStore } from 'src/stores/ui';
+const store = useUiStore();
 interface Props {
   tableItem: TableItem;
   ressourceName: RessourceName;

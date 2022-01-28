@@ -131,40 +131,9 @@ export type TableItem = {
     dense: boolean;
 }
 
-type FunctionlessCardAction = {
-    icon: string,
-    color: string,
-    tooltip: string,
-    name: string,
-}
-
-type FunctionlessHeaderAction = {
-    icon: string,
-    name: string,
-    datatest: string,
-}
-
 export type GenericRessource = Record<string, any> & { id: number }
 export type Ressource = IEngagement | ICompany | IContact
 
-type FunctionCardAction = {
-    function: (id: number) => void,
-    isRessourcePayloadNeed: false
-} | {
-    function: (id: number, ressource: GenericRessource) => void,
-    isRessourcePayloadNeed: true
-}
-
-type FunctionHeaderdAction = {
-    function: () => void,
-    params: 'none'
-} | {
-    function: (rows: Record<string, any>[]) => void,
-    params: 'rows'
-} | {
-    function: (ids: number[]) => void,
-    params: 'ids'
-}
 // param: ParentRessource will get the ressource added to param.
 // i.e if param = "contacts", contact will be added to "contacts"
 export type ParentRessource<T = GenericRessource> = {
@@ -172,6 +141,7 @@ export type ParentRessource<T = GenericRessource> = {
     ressource?: GenericRessource,
     param?: keyof T,
 }
-export type CardAction = (FunctionCardAction) & FunctionlessCardAction
-export type HeaderAction = (FunctionHeaderdAction) & FunctionlessHeaderAction
+
 export type Row = { id: number, [x: string]: any }
+
+export type ConfigTranslationEntries = { [key in string]?: string }[]

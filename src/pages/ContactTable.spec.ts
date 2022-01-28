@@ -1,37 +1,59 @@
+/* eslint-disable @typescript-eslint/unbound-method */
 import { mount } from '@cypress/vue';
-
-import { storeKey } from 'src/store';
-import store from 'src/store/index';
 import { Dialog, Notify } from 'quasar';
 import { installQuasarPlugin } from '@quasar/quasar-app-extension-testing-e2e-cypress';
 import ContactTable from 'src/pages/ContactTable.vue';
 import { makeFakeEngagement } from '../factories/mock/engagement';
-import { useRouter } from 'vue-router';
+import { useRouter, useRoute, createRouter, createWebHistory } from 'vue-router';
 import { DataTest } from '../enums/enums';
+import { createTestingPinia } from '@pinia/testing';
+import { RessourceName } from 'src/enums/enums';
+import { useUiStore } from 'src/stores/ui';
+
 
 installQuasarPlugin({ plugins: { Dialog, Notify } });
 const fakeEngagement = makeFakeEngagement();
-const router = useRouter();
+const mockRouter = createRouter({ history: createWebHistory(), routes: [] });
+mockRouter.currentRoute.value.query = { engagement: 'test engagement (from query param)' };
+
+
+Notify.setDefaults({ timeout: 10 });
+
 describe('The empty ContactTable', () => {
 
     beforeEach(() => {
-        cy.intercept('get', '/engagements/**', { statusCode: 200, body: [] }).as('emptyContacts');
+        cy.intercept('get', '/engagements/**', []).as('emptyContacts');
         mount(ContactTable,
             {
                 props: { parentEngagementId: fakeEngagement.id },
                 global: {
-                    plugins: [router],
-                    provide: { [(storeKey as any)]: store }
+                    plugins: [mockRouter, createTestingPinia({
+                        createSpy: (action: any) => cy.spy(action), stubActions: false
+                    })]
                 },
             }).as('wrapper');
-        Notify.setDefaults({ timeout: 10 });
     });
+
+    it('store load contacts', () => {
+        const store = useUiStore();
+        cy.wait('@emptyContacts').then(() => {
+            expect(store.updateRessourceTable).to.have.been.calledWith(RessourceName.Contact, []);
+        });
+    });
+
+    it('should have query engagement in title', () => {
+        cy.dataCy(DataTest.RessourceTableHeaderTitle).should('contain.html', 'test engagement');
+    });
+
 
 
     it('has a loading bar, then no data component', () => {
+        const store = useUiStore();
         // await router.push({ name: 'contacts', params: { parentEngagement: fakeEngagement.id } });
         cy.dataCy(DataTest.RessourceTableOpenHeaderMenuBtn).click().then(() => {
+            expect(store.updateRessourceMenu).to.have.been.calledWith(RessourceName.Contact, true);
             cy.dataCy(DataTest.RessourceTableHeaderDeleteAll).should('exist');
         });
     });
+
 });

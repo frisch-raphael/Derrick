@@ -1,13 +1,11 @@
 import request from 'src/axios';
 import { Notify } from 'quasar';
 import { AxiosError } from 'axios';
-// import store from 'src/store';
-import { MutationType } from 'src/store/columbo/mutations-types';
 import { RessourceName } from 'src/enums/enums';
-import { ressourceNameToApi } from 'src/utils';
+import { ressourceNameToApi } from 'src/utils/utils';
 import { ParentRessource } from '../../types/types';
-import { capitalizeFirstLetter } from '../../utils';
-import { useStore } from 'src/stores';
+import { capitalizeFirstLetter } from '../../utils/utils';
+import { useUiStore } from 'src/stores/ui';
 
 export interface IRestClient {
     // index(): Promise<void>;
@@ -19,7 +17,7 @@ export interface IRestClient {
 export default class RestClient implements IRestClient {
 
     private endpoint: string;
-    private store = useStore();
+    private store = useUiStore();
 
     constructor(private ressourceName: RessourceName, private parentRessource?: ParentRessource) {
         if (parentRessource?.ressource?.id && parentRessource?.ressourceName) {
@@ -66,6 +64,7 @@ export default class RestClient implements IRestClient {
             throw error;
         }
     }
+    
 
     public async delete(id: number[]) {
         this.loading(id);
