@@ -41,7 +41,11 @@
             :data-cy="menuItem.name"
             :class="getDrawerTitleClasses(menuItem.isTitle)"
           >
-            <router-link v-if="menuItem.goto" :to="{ name: menuItem.goto }">
+            <router-link
+              v-if="menuItem.goto"
+              style="text-decoration: none; color: inherit"
+              :to="{ name: menuItem.goto }"
+            >
               {{ menuItem.name }}
             </router-link>
             <span v-else>{{ menuItem.name }}</span>

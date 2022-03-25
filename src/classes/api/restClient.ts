@@ -4,7 +4,7 @@ import { AxiosError } from 'axios';
 import { RessourceName } from 'src/enums/enums';
 import { ressourceNameToApi } from 'src/utils/utils';
 import { ParentRessource } from '../../types/types';
-import { capitalizeFirstLetter } from '../../utils/utils';
+import { capitalizeFirstLetter, prettyVariable } from '../../utils/utils';
 import { useUiStore } from 'src/stores/ui';
 
 export interface IRestClient {
@@ -34,7 +34,7 @@ export default class RestClient implements IRestClient {
     }
 
     get ressourceUiName() {
-        return capitalizeFirstLetter(this.ressourceName);
+        return prettyVariable(capitalizeFirstLetter(this.ressourceName));
     }
 
     private loading(ids: number[]) {
@@ -64,7 +64,7 @@ export default class RestClient implements IRestClient {
             throw error;
         }
     }
-    
+
 
     public async delete(id: number[]) {
         this.loading(id);

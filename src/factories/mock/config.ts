@@ -1,41 +1,41 @@
-import { IColumboConfig } from 'src/dtos/columbo-config';
+import { IColumboConfig } from 'src/dtos/columboConfig';
 
 export const makeFakeConfig = (): IColumboConfig => {
     return {
         assessment_types: [
             {
                 fr: 'Interne',
-                gb: 'Internal'
+                en: 'Internal'
             },
             {
                 fr: 'Externe',
-                gb: 'External'
+                en: 'External'
             },
             {
                 fr: 'Web',
-                gb: 'Web'
+                en: 'Web'
             },
             {
                 fr: 'Phishing',
-                gb: 'Phishing'
+                en: 'Phishing'
             }
         ],
         languages: [
-            'gb',
+            'en',
             'fr',
         ],
         finding_types: [
             {
                 fr: 'Injection',
-                gb: 'Injection'
+                en: 'Injection'
             },
             {
                 fr: 'Autorisation',
-                gb: 'Authorization'
+                en: 'Authorization'
             },
             {
                 fr: 'Gestion des mots de passe',
-                gb: 'Password management'
+                en: 'Password management'
             }
         ]
         // contacts: [makeFakeContact(), makeFakeContact()]

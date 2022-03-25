@@ -5,9 +5,9 @@
 import { TableItem, ParentRessource } from 'src/types/types';
 import { LooseDictionary } from 'src/types/types';
 import { DataTest, RessourceName } from 'src/enums/enums';
-import { RessourceActions } from 'src/ui/BaseTable/ressourceActions';
-import { capitalizeFirstLetter } from 'src/utils/utils';
 import { useUiStore } from 'src/stores/ui';
+import DefaultRessourceActions from '../DefaultRessourceActions.vue';
+
 const store = useUiStore();
 interface Props {
   tableItem: TableItem;
@@ -17,8 +17,6 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
   parentRessource: undefined,
 });
-
-const ressourceActions = new RessourceActions(props.ressourceName, props.parentRessource);
 
 const getFilteredcols = (cols: LooseDictionary) =>
   cols.filter((col: { name: string; label: string; value: any }) => col.name !== 'title');
@@ -45,28 +43,7 @@ const isLoading = (id: number) => store.ressourceTableLoading[props.ressourceNam
             :label="tableItem?.row.title"
           />
           <q-space></q-space>
-          <q-btn
-            :data-cy="DataTest.RessourceTableCardUpdateBtn"
-            icon="mdi-open-in-new"
-            color="secondary"
-            flat
-            class="self-start q-pt-sm q-pa-xs"
-            size="sm"
-            @click="ressourceActions.openEditDialog(tableItem?.row)"
-          >
-            <q-tooltip>Edit {{ capitalizeFirstLetter(props.ressourceName) }}</q-tooltip>
-          </q-btn>
-          <q-btn
-            :data-cy="DataTest.RessourceTableCardDeleteBtn"
-            icon="mdi-close-circle"
-            color="red-10"
-            flat
-            class="self-start q-pt-sm q-pr-sm q-pa-xs"
-            size="sm"
-            @click="ressourceActions.deleteRowsInTableAndBackend([tableItem?.row.id])"
-          >
-            <q-tooltip>Delete {{ capitalizeFirstLetter(props.ressourceName) }}</q-tooltip>
-          </q-btn>
+          <default-ressource-actions v-bind="props"></default-ressource-actions>
         </div>
       </q-card-section>
       <q-separator />

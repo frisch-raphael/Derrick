@@ -13,6 +13,7 @@ export enum RessourceName {
     Engagement = 'engagement',
     Contact = 'contact',
     Company = 'company',
+    TemplateFinding = 'template_finding',
     ColumboConfig = 'config',
 }
 
@@ -20,12 +21,12 @@ export enum ApiRessource {
     Engagement = '/engagements',
     Contact = '/contacts',
     Company = '/companies',
-    Config = '/config'
+    Config = '/config',
+    TemplateFinding = '/template_findings'
 }
 
-
-
 export enum DataTest {
+    CreateEditConfirmClose = 'create-edit-confirm',
     DrawerReportBtn = 'drawer-report-button',
     DrawerAdminBtn = 'drawer-admin-button',
     DialogBase = 'base-dialog',
@@ -37,6 +38,7 @@ export enum DataTest {
     FormDateDialog = 'date-form-dialog',
     FormDateOpenBtn = 'date-form-open-btn',
     RessourceForm = 'ressource-form',
+    RessourceFormConfirmation = 'ressource-form-confirmation',
     RessourceFormNoData = 'no-data',
     RessourceFormCreateEditBtn = 'engagement-create-edit-btn',
     RessourceTable = 'ressource-table',
@@ -62,5 +64,6 @@ export enum DataTest {
     EngagementFormStartDate = 'form-start_date',
     EngagementFormAssessmentType = 'form-assessment_type',
     EngagementFormTitle = 'form-title',
+    EngagementFormLanguage = 'form-language',
     CompanyFormFullName = 'form-full_name',
 }

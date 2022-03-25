@@ -20,9 +20,11 @@ describe('A ressource form', () => {
         plugins: [createTestingPinia({ stubActions: false })]
       },
       props: {
-        ressourceFormConfig: engagementForm(useConfigStore()),
+        ressourceFormConfig: engagementForm,
       },
     });
+    useConfigStore();
+
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     wrapper.findComponent(BaseInputForm).vm.$emit('update:modelValue', 'test');

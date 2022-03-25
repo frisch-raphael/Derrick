@@ -4,7 +4,7 @@ import { DataTest, RessourceName } from 'src/enums/enums';
 import { makeFakeEngagements, makeFakeEngagement } from 'src/factories/mock/engagement';
 import { Dialog, Notify } from 'quasar';
 import { installQuasarPlugin } from '@quasar/quasar-app-extension-testing-e2e-cypress';
-import { initRessourceFormWithEngagement, verifyCardContainsContact, verifyCardContainsEngagement } from '../../../test/cypress/utils';
+import { initRessourceFormWithEngagement, verifyCardContainsContact, verifyCardContainsEngagement, getDefaultConfigStore } from '../../../test/cypress/utils';
 import { ressourceConfig } from 'src/utils/utils';
 import { ParentRessource } from 'src/types/types';
 import { makeFakeContacts } from 'src/factories/mock/contact';
@@ -14,7 +14,6 @@ import { IContact } from 'src/dtos/contact';
 import { IEngagement } from 'src/dtos/engagement';
 import { createTestingPinia } from '@pinia/testing';
 import { useUiStore } from 'src/stores/ui';
-import { useConfigStore } from 'src/stores/config';
 import { capitalizeFirstLetter } from 'src/utils/utils';
 import { ApiRessource } from 'src/enums/enums';
 import { makeFakeConfig } from 'src/factories/mock/config';
@@ -22,7 +21,9 @@ import { makeFakeConfig } from 'src/factories/mock/config';
 installQuasarPlugin({ plugins: { Dialog, Notify } });
 
 const parentEngagement: ParentRessource = { ressourceName: RessourceName.Engagement, ressource: { id: 1 } };
-
+const fakeEngagement = makeFakeEngagement();
+fakeEngagement.language = 'French';
+fakeEngagement.assessment_type = 'Interne';
 const ressourceConfigWithFakes = [
     {
         ...ressourceConfig.engagement,
@@ -30,7 +31,7 @@ const ressourceConfigWithFakes = [
         name: RessourceName.Engagement,
         parentRessource: undefined,
         endpoint: ressourceConfig.engagement.api,
-        initForm: () => initRessourceFormWithEngagement(makeFakeEngagement()),
+        initForm: () => initRessourceFormWithEngagement(fakeEngagement),
         verifyForm: (engagement: Partial<IEngagement>) => verifyCardContainsEngagement(engagement),
     },
     {
@@ -46,9 +47,9 @@ const ressourceConfigWithFakes = [
 
 for (const ressourceConfig of Object.values(ressourceConfigWithFakes)) {
 
-    describe('The BaseTable mounted with' + ressourceConfig.name, () => {
+    describe('The BaseTable mounted with ' + ressourceConfig.name, () => {
 
-        beforeEach(async () => {
+        beforeEach(() => {
 
             mount(BaseTable,
                 {
@@ -67,9 +68,7 @@ for (const ressourceConfig of Object.values(ressourceConfigWithFakes)) {
             const store = useUiStore();
 
             cy.intercept('get', ApiRessource.Config, makeFakeConfig()).as('emptyContacts');
-            const confStore = useConfigStore();
-            await confStore.updateConfigTranslationEntries();
-
+            getDefaultConfigStore();
 
             store.updateCreateEditRessourceState(
                 {
@@ -79,7 +78,6 @@ for (const ressourceConfig of Object.values(ressourceConfigWithFakes)) {
                 });
             store.updateRessourceTable(ressourceConfig.name, ressourceConfig.fakes);
             Notify.setDefaults({ timeout: 200 });
-
         });
 
         it('has correct title', () => {

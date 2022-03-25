@@ -1,4 +1,3 @@
-import { GenericRessource } from '../types/types';
 import RestClient from 'src/classes/api/restClient';
 
 export const createRestClientWithMockedIndex = (fakeResponse: Record<string, any>[] | Record<string, any>) => {

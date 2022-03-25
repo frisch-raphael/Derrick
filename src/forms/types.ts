@@ -2,7 +2,7 @@ import BaseInputForm from 'src/ui/form/BaseInputForm.vue';
 
 type FormComponent = typeof BaseInputForm
 
-type RessourceFormParams = {
+export type RessourceFormParams = {
     component: FormComponent,
     attrs?: Record<string, any>,
     icon?: string,

@@ -8,8 +8,10 @@ import { installQuasarPlugin } from '@quasar/quasar-app-extension-testing-e2e-cy
 import { Dialog, Notify } from 'quasar';
 import { createTestingPinia } from '@pinia/testing';
 import { useConfigStore } from 'src/stores/config';
+import { makeFakeConfig } from '../factories/mock/config';
 installQuasarPlugin({ plugins: { Dialog, Notify } });
 
+const fakeConfig = makeFakeConfig();
 
 describe('The RessourceForm', () => {
 
@@ -23,16 +25,25 @@ describe('The RessourceForm', () => {
                 })]
             },
             props: {
-                ressourceFormConfig: engagementForm(useConfigStore()),
+                // ressourceFormConfig: engagementForm(useConfigStore(), fakeConfig.languages[0]),
                 ressource: fakeEngagement
             }
-        });
-        ;
-
+        }).as('wrapper');
+        const confStore = useConfigStore();
+        confStore.assessmentTypesTranslations = fakeConfig.assessment_types;
+        confStore.supportedLanguages = fakeConfig.languages;
+        cy.get('@wrapper').invoke('setProps', { ressourceFormConfig: engagementForm });
     });
 
-
-
+    // it('emits that ressource values initialized', () => {
+    //     // cy.wrap(Cypress.vueWrapper).then((wrapper) => {
+    //     expect(wrapper.emitted('defaultValuesDone')).to.have.length(1);
+    // });
+    // cy.get('@wrapper').invoke('emitted', 'defaultValuesDone').then((test) => {
+    //     console.log(test);
+    //     debugger;
+    // });
+    // });
 
     it('display error if title not filled', () => {
         cy.get(FullDataTest(DataTest.EngagementFormTitle)).clear();
@@ -41,7 +52,6 @@ describe('The RessourceForm', () => {
         });
         cy.get(FullDataTest(DataTest.EngagementFormTitle)).type('azddfs').then(() => {
             cy.dataCy(DataTest.RessourceForm).should('not.contain', 'Title is required');
-
         });
     });
 
@@ -58,7 +68,6 @@ describe('The RessourceForm', () => {
     });
 
     it('has correct values', () => {
-
         cy.get("[data-test='form-title']").should('have.value', fakeEngagement.title);
         cy.get("[data-test='form-assessment_type']").should('contain.text', fakeEngagement.assessment_type);
         cy.get("[data-test='form-language']").should('contain.text', fakeEngagement.language);
@@ -66,8 +75,5 @@ describe('The RessourceForm', () => {
         cy.get("[data-test='form-start_date']").should('have.value', fakeEngagement.start_date);
         cy.get("[data-test='form-end_date']").should('have.value', fakeEngagement.end_date);
     });
-
-
-
 
 });

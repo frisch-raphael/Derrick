@@ -2,37 +2,60 @@
 import { RessourceFormGeneric } from 'src/forms/types';
 import { prettyVariable } from 'src/utils/utils';
 import { DataTest } from 'src/enums/enums';
-import { toRefs } from 'vue';
+import { reactive, computed } from 'vue';
 import { GenericRessource } from 'src/types/types';
+import { RessourceFormParams } from '../forms/types';
+import { useConfigStore } from 'src/stores/config';
+import ISO6391 from 'iso-639-1';
+
+const confStore = useConfigStore();
 
 const props = defineProps<{
   ressourceFormConfig: RessourceFormGeneric;
   ressource?: GenericRessource;
 }>();
-let ressourceTosubmit: Record<string, any> = toRefs({});
+const state = reactive({ ressourceTosubmit: {} as Record<string, any> });
 const emit = defineEmits(['ressourceFormUpdate', 'submit', 'submitClick']);
 
-const initDefaultValue = () => {
+const initDefaultValues = () => {
   if (props.ressource) {
-    ressourceTosubmit = { ...props.ressource };
-    emit('ressourceFormUpdate', ressourceTosubmit);
-    return;
+    state.ressourceTosubmit = { ...props.ressource };
+  } else {
+    for (const param in props.ressourceFormConfig) {
+      state.ressourceTosubmit[param] = props.ressourceFormConfig[param].default;
+    }
   }
-  for (const param in props.ressourceFormConfig) {
-    ressourceTosubmit[param] = props.ressourceFormConfig[param].default;
-    emit('ressourceFormUpdate', ressourceTosubmit);
-  }
+  emit('ressourceFormUpdate', state.ressourceTosubmit);
 };
-initDefaultValue();
+
+const getFormAttributes = (config: RessourceFormParams, param: string) => {
+  const language = (state.ressourceTosubmit.language as string) || confStore.supportedLanguages?.[0] || '';
+  if (!config?.attrs) config.attrs = {};
+  // const parametersNeedingTranslation = ['assessment_type', 'finding_type']
+  config.attrs.languageCode = ISO6391.getCode(language);
+  if (param === 'assessment_type') {
+    config.attrs.optionsTranslations = confStore.assessmentTypesTranslations;
+  } else if (param === 'finding_type') {
+    config.attrs.optionsTranslations = confStore.findingTypesTranslations;
+  } else if (param === 'hacker_profile') {
+    config.attrs.optionsTranslations = confStore.hackerProfilesTranslations;
+  } else if (param === 'language') {
+    config.attrs.options = confStore.supportedLanguages;
+    config.attrs.value = confStore.supportedLanguages?.[0];
+  }
+  return config.attrs;
+};
 
 const updateForm = (param: string, value: string) => {
-  ressourceTosubmit[param] = value;
-  emit('ressourceFormUpdate', ressourceTosubmit);
+  state.ressourceTosubmit[param] = value;
+  emit('ressourceFormUpdate', state.ressourceTosubmit);
 };
+
 const onSubmit = () => {
   emit('submit');
 };
-const value = (param: string, defaultValue?: string) => {
+
+const getValue = (param: string, defaultValue?: string) => {
   // if there's a ressource to edit we send it as the value
   // else the default value (i.e param = state => 'Ongoing')
   // else nothing
@@ -40,6 +63,12 @@ const value = (param: string, defaultValue?: string) => {
     return props.ressource[param] as string;
   } else return defaultValue;
 };
+
+const languageCode = computed(() =>
+  ISO6391.getCode(state.ressourceTosubmit.language || confStore.supportedLanguages?.[0] || '')
+);
+
+initDefaultValues();
 </script>
 
 <template>
@@ -49,12 +78,13 @@ const value = (param: string, defaultValue?: string) => {
         :is="config.component"
         v-for="(config, param) in ressourceFormConfig"
         :key="param"
-        v-bind="config.attrs"
+        v-bind="getFormAttributes(config, param)"
         :label="prettyVariable(param)"
         :icon="config.icon"
         :data-test="`form-${param}`"
-        :value="value(param, config.default)"
+        :value="getValue(param, config.default)"
         :rules="config.rules"
+        :language-code="languageCode"
         @update:modelValue="updateForm(param, $event)"
       >
       </component>

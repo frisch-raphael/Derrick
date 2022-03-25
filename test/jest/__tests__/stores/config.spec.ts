@@ -23,7 +23,7 @@ describe('actions', () => {
     });
 
     it('update create/edit ressource form state', async () => {
-        await store.updateConfigTranslationEntries();
+        await store.fetchConfigTranslationEntries();
         expect(mockedRestClient).toHaveBeenCalled();
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
         expect(mockedRestClient.prototype.index).toHaveBeenCalled();

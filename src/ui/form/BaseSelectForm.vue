@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { reactive, watch, ref } from 'vue';
+import { reactive } from 'vue';
 
 const props = defineProps<{
   icon: string;
@@ -8,22 +8,6 @@ const props = defineProps<{
 }>();
 
 const state = reactive({ model: props.value });
-const indexOfSelectedOptions = ref(props.options.indexOf(props.value));
-
-//this is used to update the select options after a language change
-watch(
-  () => props.options,
-  (options) => {
-    state.model = options[indexOfSelectedOptions.value];
-  }
-);
-//this is used to update the select options after a language change
-watch(
-  () => state.model,
-  (newValue) => {
-    indexOfSelectedOptions.value = props.options.indexOf(newValue);
-  }
-);
 </script>
 
 <template>

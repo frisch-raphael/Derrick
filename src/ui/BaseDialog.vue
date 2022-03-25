@@ -4,11 +4,9 @@ import { useSlots } from 'vue';
 const slots = useSlots();
 interface Props {
   title: string;
+  actionsAlign?: 'center' | 'left' | 'right' | 'between' | 'around' | 'evenly' | 'stretch' | undefined;
 }
-withDefaults(defineProps<Props>(), {});
-
-// along with a listener for 'update:model-value' event)
-// const isDialogOpen = false;
+const props = withDefaults(defineProps<Props>(), { actionsAlign: 'center' });
 </script>
 
 <template>
@@ -33,7 +31,7 @@ withDefaults(defineProps<Props>(), {});
       <q-card-section class="q-pt-none">
         <slot></slot>
       </q-card-section>
-      <q-card-actions v-if="slots.actions" align="right">
+      <q-card-actions v-if="slots.actions" :align="props.actionsAlign">
         <slot name="actions"></slot>
       </q-card-actions>
     </q-card>

@@ -6,9 +6,9 @@ import { getRandomInt } from 'src/factories/utils';
 import { DateTime } from 'luxon';
 import { makeFakeContacts } from 'src/factories/mock/contact';
 
-const languages = ['French', 'English'];
+const languages = ['English'];
 const tests = ['Internal pentest', 'Phishing campain', 'Applicat web Contoso'];
-const assess = ['Internal', 'External'];
+export const assess = ['Internal', 'External'];
 
 export const makeFakeEngagement = (): IEngagement => {
     // const date = Math.random() * 365; 

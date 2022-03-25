@@ -2,12 +2,14 @@
 import { ref, Ref } from 'vue';
 import SearchInput from 'src/ui/SearchInput.vue';
 import BaseTableCard from './BaseTableCard/BaseTableCard.vue';
+import BaseTableRowBody from './BaseTableRowBody.vue';
 import BaseTableHeaderMenu from 'src/ui/BaseTable/BaseTableHeaderMenu/BaseTableHeaderMenu.vue';
 import CreateEditRessourceDialog from 'src/ui/BaseTable/CreateEditRessourceDialog.vue';
 import { Columns, ParentRessource, Row, TableItem } from 'src/types/types';
 import { RessourceName, DataTest } from 'src/enums/enums';
 import { LooseDictionary } from 'src/types/types';
 import { useUiStore } from 'src/stores/ui';
+import { prettyVariable } from 'src/utils/utils';
 
 const store = useUiStore();
 
@@ -27,7 +29,6 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const isLoading = ref(false);
-
 const filter = ref(''); //TODO link to SearchInput
 const selected: Ref<Row[]> = ref([]);
 
@@ -39,9 +40,11 @@ const selectAllClicked = (checked: boolean) => {
   selected.value = checked ? store.ressourceTableRows[props.ressourceName] ?? [] : [];
 };
 
-const typeSlotProps = (slotProps: LooseDictionary) => {
-  return slotProps as TableItem;
-};
+const typeSlotProps = (slotProps: LooseDictionary) => slotProps as TableItem;
+
+const columns = props.grid
+  ? props.columns
+  : props.columns?.concat({ name: 'Actions', field: 'Actions', label: 'Actions' });
 </script>
 
 <template>
@@ -73,6 +76,7 @@ const typeSlotProps = (slotProps: LooseDictionary) => {
           :data-cy="DataTest.RessourceTableHeader"
           :parent-ressource="parentRessource"
           :ressource-name="ressourceName"
+          :grid="props.grid"
           @all-selected="selectAllClicked"
         ></base-table-header-menu>
       </template>
@@ -88,6 +92,13 @@ const typeSlotProps = (slotProps: LooseDictionary) => {
           </template>
         </base-table-card>
       </template>
+      <template v-if="!grid" #body="slotProps">
+        <base-table-row-body
+          :parent-ressource="props.parentRessource"
+          :ressource-name="props.ressourceName"
+          :slot-props="slotProps"
+        ></base-table-row-body>
+      </template>
     </q-table>
 
     <q-markup-table
@@ -96,9 +107,9 @@ const typeSlotProps = (slotProps: LooseDictionary) => {
     >
       <q-banner>
         <template #avatar>
-          <q-icon color="primary" name="mdi-emoticon-sad-outline" />
+          <q-icon color="primary" name="mdi-cat" />
         </template>
-        No {{ ressourceName }} found ! Create one from the menu.
+        No {{ prettyVariable(ressourceName) }} found ! Create one from the menu.
       </q-banner>
     </q-markup-table>
 
@@ -108,3 +119,16 @@ const typeSlotProps = (slotProps: LooseDictionary) => {
     ></create-edit-ressource-dialog>
   </div>
 </template>
+
+<style lang="sass">
+.q-checkbox__inner--truthy
+  color: var(--q-primary) !important
+.q-checkbox__inner--indet
+  color: var(--q-primary) !important
+.q-table .q-checkbox
+  padding-left: 0px
+.q-table th
+  text-align: left
+.q-table th:last-child
+  text-align: right
+</style>

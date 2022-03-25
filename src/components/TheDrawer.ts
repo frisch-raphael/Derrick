@@ -23,7 +23,7 @@ export default defineComponent({
             },
             { name: 'Templates', isTitle: true, isSeparator: true },
             { name: 'Reports', icon: 'mdi-book-open-blank-variant' },
-            { name: 'Findings', icon: 'mdi-feature-search-outline' },
+            { name: 'Findings', icon: 'mdi-feature-search-outline', goto: 'template_findings' },
             { name: 'Technical tests', icon: 'mdi-test-tube' },
             { name: 'Exploitations', icon: 'mdi-bomb' },
             { name: 'UDOs', icon: 'mdi-collapse-all-outline' },

@@ -4,14 +4,20 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/',
     name: 'engagements',
-    component: () => import('pages/EngagementTable.vue')
+    component: () => import('src/pages/RessourceTables/EngagementTable.vue')
     // children: [{ path: '', component: () => import('pages/ReportsTable.vue') }],
   },
   {
     path: '/engagement/:parentEngagementId/contacts',
     name: 'contacts',
     props: true,
-    component: () => import('pages/ContactTable.vue')
+    component: () => import('src/pages/RessourceTables/ContactTable.vue')
+    // children: [{ path: '', component: () => import('pages/ReportsTable.vue') }],
+  },
+  {
+    path: '/template_findings',
+    name: 'template_findings',
+    component: () => import('src/pages/RessourceTables/TemplateFindingTable.vue')
     // children: [{ path: '', component: () => import('pages/ReportsTable.vue') }],
   },
 

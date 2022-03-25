@@ -2,7 +2,7 @@
 import { computed, ref } from 'vue';
 import { Row, ParentRessource } from 'src/types/types';
 import { RessourceName, DataTest } from 'src/enums/enums';
-import { capitalizeFirstLetter } from 'src/utils/utils';
+import { capitalizeFirstLetter, prettyVariable } from 'src/utils/utils';
 import { RessourceActions } from 'src/ui/BaseTable/ressourceActions';
 import { useUiStore } from 'src/stores/ui';
 const store = useUiStore();
@@ -13,6 +13,7 @@ const props = defineProps<{
   selected: Row[];
   parentRessource?: ParentRessource;
   title: string;
+  grid: boolean;
 }>();
 const ressourceActions = new RessourceActions(props.ressourceName, props.parentRessource);
 
@@ -34,12 +35,13 @@ const selectAll = ref(false);
 <template>
   <div>
     <q-checkbox
+      v-if="props.grid"
       v-model="selectAll"
       :data-cy="DataTest.RessourceTableSelectAll"
       @click="emit('all-selected', selectAll)"
     ></q-checkbox>
     <span :data-cy="DataTest.RessourceTableHeaderTitle" class="text-h6 q-mr-sm">
-      {{ title || `${capitalizeFirstLetter(ressourceName)}s` }}
+      {{ title || `${prettyVariable(capitalizeFirstLetter(ressourceName))}s` }}
     </span>
     <q-btn
       size="sm"
@@ -56,7 +58,7 @@ const selectAll = ref(false);
             clickable
             @click="ressourceActions.openCreateDialog()"
           >
-            <q-item-section>{{ 'Create new ' + props.ressourceName }}</q-item-section>
+            <q-item-section>{{ 'Create new ' + prettyVariable(props.ressourceName) }}</q-item-section>
           </q-item>
           <q-item
             :clickable="!isDisabled()"

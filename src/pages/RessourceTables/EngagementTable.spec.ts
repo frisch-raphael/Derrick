@@ -3,18 +3,20 @@ import { DataTest } from 'src/enums/enums';
 import { makeFakeEngagements } from 'src/factories/mock/engagement';
 import { Dialog, Notify } from 'quasar';
 import { installQuasarPlugin } from '@quasar/quasar-app-extension-testing-e2e-cypress';
-import EngagementTable from 'src/pages/EngagementTable.vue';
-import { ICompany } from '../dtos/company';
-import { makeFakeCompany } from '../factories/mock/company';
+import EngagementTable from 'src/pages/RessourceTables/EngagementTable.vue';
+import { ICompany } from '../../dtos/company';
+import { makeFakeCompany } from '../../factories/mock/company';
 import { createTestingPinia } from '@pinia/testing';
 import { useUiStore } from 'src/stores/ui';
 import { createRouter, createWebHistory } from 'vue-router';
+import { getDefaultConfigStore } from '../../../test/cypress/utils';
+import { makeFakeConfig } from '../../factories/mock/config';
 const mockRouter = createRouter({
     history: createWebHistory(), routes: [{
         path: '/engagement/:parentEngagementId/contacts',
         name: 'contacts',
         props: true,
-        component: () => import('pages/ContactTable.vue')
+        component: () => import('src/pages/RessourceTables/ContactTable.vue')
         // children: [{ path: '', component: () => import('pages/ReportsTable.vue') }],
     }]
 });
@@ -26,6 +28,7 @@ describe('The empty EngagementTable', () => {
 
     beforeEach(() => {
         cy.intercept('get', '/engagements', []).as('engagements');
+        cy.intercept('get', '/config', makeFakeConfig());
         mount(EngagementTable,
             {
                 global: {
@@ -35,9 +38,10 @@ describe('The empty EngagementTable', () => {
                 },
             }).as('wrapper');
         useUiStore();
+        getDefaultConfigStore();
+
         Notify.setDefaults({ timeout: 10 });
     });
-
 
     it('has a loading bar, then no data component', () => {
         cy.dataCy(DataTest.EngagementTableLoading).should('not.have.attr', 'aria-valuenow');
@@ -48,7 +52,6 @@ describe('The empty EngagementTable', () => {
     });
 });
 
-
 describe('The EngagementTable', () => {
 
     beforeEach(() => {
@@ -57,6 +60,7 @@ describe('The EngagementTable', () => {
             statusCode: 200,
             body: fakeEngagements
         }).as('engagements');
+        cy.intercept('get', '/config', makeFakeConfig());
 
         mount(EngagementTable,
             {
@@ -67,6 +71,7 @@ describe('The EngagementTable', () => {
                 },
             }).as('wrapper');
         useUiStore();
+        getDefaultConfigStore();
     });
 
 
@@ -83,27 +88,6 @@ describe('The EngagementTable', () => {
         });
         cy.dataCy(DataTest.DialogBaseClose).click().then(() => {
             cy.dataCy(DataTest.RessourceForm).should('not.exist');
-        });
-    });
-
-    it('company is present inside card after creation', () => {
-        const newEngagementCompany = makeFakeCompany();
-        cy.intercept('POST', '/engagements/*/companies', { body: newEngagementCompany, delay: 200 });
-        cy.dataCy(DataTest.EngagementTableCompanyBtn).first().click().then(() => {
-            cy.get('[data-test="form-full_name"]').type('this wont matter data comes frop api');
-            cy.dataCy(DataTest.RessourceFormCreateEditBtn).click().then(() => {
-                cy.get('.bg-positive.q-notification').should('exist');
-                cy.get('.bg-positive.q-notification').contains(/create/).should('exist');
-                cy.dataCy(DataTest.EngagementTableCompanyBtn).first().click().then(() => {
-
-                    for (const [key, value] of Object.entries(newEngagementCompany)) {
-                        if (key == 'id') continue;
-
-                        cy.get(`[data-test="form-${key}"]`).should('have.value', value);
-                    }
-                });
-                cy.dataCy(DataTest.RessourceForm).type('{esc}');
-            });
         });
     });
 

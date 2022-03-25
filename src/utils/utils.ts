@@ -4,14 +4,11 @@ import { engagementForm } from 'src/forms/engagement';
 import { RessourceFormGeneric } from 'src/forms/types';
 import { companyForm } from '../forms/company';
 import { contactForm } from '../forms/contact';
-import { contactColumns, engagementColumns } from '../pages/columns';
+import { contactColumns, engagementColumns, templateFindingColumns } from '../pages/RessourceTables/columns';
 import { Column, GenericRessource } from '../types/types';
-import { useConfigStore } from '../stores/config';
+import { templateFindingForm } from '../forms/templateFinding';
 
-export const prettyVariable = (variable: string) => {
-    const noComplexChar = variable.replace(/[^a-zA-Z0-9+]+/gi, ' ');
-    return (noComplexChar.charAt(0).toUpperCase() + noComplexChar.slice(1));
-};
+export const prettyVariable = (variable: string) => variable.replace(/[^a-zA-Z0-9+]+/gi, ' ');
 
 export const capitalizeFirstLetter = (string: string) => {
     return (string.charAt(0).toUpperCase() + string.slice(1));
@@ -21,22 +18,28 @@ export const FullDataTest = (dataTest: DataTest) => {
     return `[data-test='${dataTest}']`;
 };
 
-type GetForm = ((store: ReturnType<typeof useConfigStore>, language: string) => RessourceFormGeneric) | (() => RessourceFormGeneric)
+export const FullDataCy = (dataTest: DataTest) => {
+    return `[data-cy='${dataTest}']`;
+};
+
+// type GetForm = ((store: ReturnType<typeof useConfigStore>, language: string) => RessourceFormGeneric) | (() => RessourceFormGeneric)
 export const ressourceConfig: { [key in RessourceName]: {
-    getForm: GetForm,
+    form: RessourceFormGeneric,
     api: ApiRessource,
     columns: Column<GenericRessource>[]
 } } =
 {
-    contact: { getForm: contactForm, api: ApiRessource.Contact, columns: contactColumns },
-    company: { getForm: companyForm, api: ApiRessource.Contact, columns: contactColumns },
-    engagement: { getForm: engagementForm, api: ApiRessource.Engagement, columns: engagementColumns },
-    config: { getForm: companyForm, api: ApiRessource.Company, columns: engagementColumns }
+    contact: { form: contactForm, api: ApiRessource.Contact, columns: contactColumns },
+    company: { form: companyForm, api: ApiRessource.Contact, columns: contactColumns },
+    engagement: { form: engagementForm, api: ApiRessource.Engagement, columns: engagementColumns },
+    config: { form: companyForm, api: ApiRessource.Company, columns: engagementColumns },
+    template_finding: { form: templateFindingForm, api: ApiRessource.TemplateFinding, columns: templateFindingColumns },
 };
 
 export const ressourceNameToApi: { [key in RessourceName]: ApiRessource } = {
     engagement: ApiRessource.Engagement,
     contact: ApiRessource.Contact,
     company: ApiRessource.Company,
-    config: ApiRessource.Config
+    config: ApiRessource.Config,
+    template_finding: ApiRessource.TemplateFinding
 };
